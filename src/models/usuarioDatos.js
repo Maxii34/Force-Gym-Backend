@@ -53,6 +53,15 @@ const usuarioSchema = new Schema(
       min: 1900,
       max: new Date().getFullYear(),
     },
+    pago: {
+      type: Number,
+      required: true,
+      min: 0, 
+    },
+    fecha: {
+      type: Date,
+      default: Date.now, 
+    },
   },
   {
     timestamps: true,
