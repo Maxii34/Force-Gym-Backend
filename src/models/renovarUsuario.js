@@ -11,11 +11,17 @@ const renovacionSchema = new Schema(
       type: Date,
       default: Date.now, 
     },
-    dni: {
+     dni: {
       type: String,
       required: true,
-      trim: true, 
-      index: true, 
+      unique: true,
+      trim: true,
+      validate: {
+        validator: function (v) {
+          return /^[0-9]+$/.test(v);
+        },
+        message: "El DNI solo debe contener números",
+      },
     },
   },
   {
