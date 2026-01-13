@@ -3,12 +3,16 @@ import cors from "cors";
 import morgan from "morgan";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
+import './dbConfig.js';
+import indexRoutes from "../routers/index.routes.js";
+
 
 export default class Server {
   constructor() {
     this.app = express();
     this.port = process.env.PORT || 3001;
     this.middlewares();
+    this.routes();
   }
 
   middlewares() {
@@ -18,6 +22,10 @@ export default class Server {
 
     const __dirname = dirname(fileURLToPath(import.meta.url));
     this.app.use(express.static(__dirname + "/../../public"));
+  }
+
+  routes() {
+    this.app.use("/api", indexRoutes);
   }
 
   listen() {
