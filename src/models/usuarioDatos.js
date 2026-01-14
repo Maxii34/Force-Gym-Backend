@@ -31,7 +31,6 @@ const usuarioSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      // Esta regex acepta números con o sin guiones, paréntesis o +
       match: [/^\+?[0-9\s-]{7,15}$/, "El teléfono no es válido"],
     },
     dni: {
@@ -39,7 +38,6 @@ const usuarioSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      // Evita que se guarde puntos o letras solo Numeros.
       validate: {
         validator: function (v) {
           return /^[0-9]+$/.test(v);
@@ -47,26 +45,37 @@ const usuarioSchema = new Schema(
         message: "El DNI solo debe contener números",
       },
     },
-    fechaNacimiento: {
-      type: Date,
-      required: true,
-      min: 1900,
-      max: new Date().getFullYear(),
-    },
     pago: {
       type: Number,
       required: true,
       min: 0, 
     },
-    fecha: {
-      type: Date,
-      default: Date.now, 
+    estado: {
+      type: String,
+      enum: ['activo', 'inactivo', 'suspendido'],
+      default: 'activo'
     },
+    fechaInicio: {
+      type: Date,
+      default: Date.now
+    },
+    fechaVencimiento: {
+      type: Date,
+      required: true
+    },
+    tipoMembresia: {
+      type: String,
+      enum: ['mensual', 'trimestral', 'semestral', 'anual'],
+      required: true
+    }
   },
   {
     timestamps: true,
   }
 );
+
+// Índice para consultas frecuentes por DNI
+usuarioSchema.index({ dni: 1 });
 
 const UsuarioData = mongoose.model("UsuarioData", usuarioSchema);
 
