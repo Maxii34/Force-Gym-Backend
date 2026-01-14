@@ -2,16 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const renovacionSchema = new Schema(
   {
-    pago: {
-      type: Number,
-      required: true,
-      min: 0, 
-    },
-    fecha: {
-      type: Date,
-      default: Date.now, 
-    },
-     dni: {
+    dni: {
       type: String,
       required: true,
       unique: true,
@@ -23,9 +14,27 @@ const renovacionSchema = new Schema(
         message: "El DNI solo debe contener números",
       },
     },
+    pago: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    estado: {
+      type: String,
+      enum: ["activo", "inactivo", "suspendido"],
+      default: "activo",
+    },
+    fechaInicio: {
+      type: Date,
+      default: Date.now,
+    },
+    fechaVencimiento: {
+      type: Date,
+      required: true,
+    },
   },
   {
-    timestamps: true, 
+    timestamps: true,
   }
 );
 

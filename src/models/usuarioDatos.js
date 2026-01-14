@@ -16,17 +16,6 @@ const usuarioSchema = new Schema(
       minLength: 2,
       maxLength: 50,
     },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      lowercase: true,
-      match: [
-        /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
-        "Por favor ingrese un email válido",
-      ],
-    },
     telefono: {
       type: String,
       required: true,
