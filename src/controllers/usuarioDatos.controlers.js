@@ -1,5 +1,7 @@
 import UsuarioData from "../models/usuarioDatos.js";
+import Renovacion from "../models/renovarUsuario.js";
 
+// Ingreso de usuarios
 export const ingresoUsuarios = async (req, res) => {
   try {
     const { dni } = req.body;
@@ -39,13 +41,14 @@ export const ingresoUsuarios = async (req, res) => {
       .status(403)
       .json({ acceso: false, mensaje: "El usuario no está activo" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res
       .status(500)
       .json({ mensaje: "Error al ingresar el usuario en el servidor", error });
   }
 };
 
+// Crear nuevos usuarios
 export const crearUsuarios = async (req, res) => {
   try {
     const { dni, nombre, apellido, pago, tipoMembresia, telefono } = req.body;
@@ -93,9 +96,41 @@ export const crearUsuarios = async (req, res) => {
       .status(201)
       .json({ mensaje: "Usuario creado exitosamente", nuevoUsuario });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res
       .status(500)
       .json({ mensaje: "Error al crear el usuario en el servidor" });
   }
 };
+
+
+export const listarUsuarios = async (req, res) => {
+  try {
+    const usuarios = await UsuarioData.find();
+    res.status(200).json({ usuarios });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al listar los usuarios" });
+  }
+};
+
+export const obtenerUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const octenerUsuario = await UsuarioData.findById(id);
+    if (!octenerUsuario) {
+      return res.status(404).json({ mensaje: "Usuario no encontrado" });
+    }
+
+    res.status(200).json({ mensaje: "Usuario encontrado", octenerUsuario });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al obtener los datos del usuario" });
+  }
+};
+
+export const actualizarUsuario = async (req, res) => {};
+
+export const eliminarUsuario = async (req, res) => {};
+
+export const renovarUsuario = async (req, res) => {};
