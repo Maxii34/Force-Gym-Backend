@@ -27,6 +27,7 @@ const usuarioSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
+      immutable: true,
       validate: {
         validator: function (v) {
           return /^[0-9]+$/.test(v);

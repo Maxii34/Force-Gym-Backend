@@ -103,7 +103,6 @@ export const crearUsuarios = async (req, res) => {
   }
 };
 
-
 export const listarUsuarios = async (req, res) => {
   try {
     const usuarios = await UsuarioData.find();
@@ -129,7 +128,50 @@ export const obtenerUsuario = async (req, res) => {
   }
 };
 
-export const actualizarUsuario = async (req, res) => {};
+export const actualizarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Agregamos 'dni' y 'email' para permitir corregir errores de tipeo
+    const { nombre, apellido, pago, tipoMembresia, telefono, dni } =
+      req.body;
+
+      if (!dni || !nombre || !apellido || !pago || !tipoMembresia || !telefono) {
+        return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
+      }
+
+    // Buscamos y actualizamos en un solo paso (más eficiente)
+    const usuarioActualizado = await UsuarioData.findByIdAndUpdate(
+      id,
+      { nombre, apellido, pago, tipoMembresia, telefono, dni },
+      { new: true, runValidators: true }
+    );
+
+    // Si no encuentra nada, devuelve null
+    if (!usuarioActualizado) {
+      return res.status(404).json({ mensaje: "Usuario no encontrado" });
+    }
+
+    res.status(200).json({
+      mensaje: "Usuario actualizado exitosamente",
+      usuarioActualizado,
+    });
+  } catch (error) {
+    console.error(error);
+
+    // CORRECCIÓN IMPORTANTE: Primero verificamos el error específico
+    if (error.code === 11000) {
+      return res.status(400).json({
+        mensaje: "El email o DNI ingresado ya pertenece a otro usuario.",
+      });
+    }
+
+    // Si no es duplicado, lanzamos el error genérico
+    res
+      .status(500)
+      .json({ mensaje: "Error al actualizar los datos del usuario" });
+  }
+};
 
 export const eliminarUsuario = async (req, res) => {
   try {
@@ -140,7 +182,6 @@ export const eliminarUsuario = async (req, res) => {
     }
 
     res.status(200).json({ mensaje: "Usuario eliminado exitosamente" });
-    
   } catch (error) {
     console.error(error);
     res.status(500).json({ mensaje: "Error al eliminar el usuario" });
