@@ -131,6 +131,20 @@ export const obtenerUsuario = async (req, res) => {
 
 export const actualizarUsuario = async (req, res) => {};
 
-export const eliminarUsuario = async (req, res) => {};
+export const eliminarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const buscarusuario = await UsuarioData.findByIdAndDelete(id);
+    if (!buscarusuario) {
+      return res.status(404).json({ mensaje: "Usuario no encontrado" });
+    }
+
+    res.status(200).json({ mensaje: "Usuario eliminado exitosamente" });
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al eliminar el usuario" });
+  }
+};
 
 export const renovarUsuario = async (req, res) => {};
