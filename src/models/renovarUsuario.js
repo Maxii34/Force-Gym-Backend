@@ -5,7 +5,6 @@ const renovacionSchema = new Schema(
     dni: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
       validate: {
         validator: function (v) {
@@ -23,6 +22,11 @@ const renovacionSchema = new Schema(
       type: String,
       enum: ["activo", "inactivo", "suspendido"],
       default: "activo",
+    },
+        tipoMembresia: {
+      type: String,
+      enum: ['mensual', 'trimestral', 'semestral', 'anual'],
+      required: true
     },
     fechaInicio: {
       type: Date,
