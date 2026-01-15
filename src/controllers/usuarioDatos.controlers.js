@@ -132,7 +132,6 @@ export const actualizarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Agregamos 'dni' y 'email' para permitir corregir errores de tipeo
     const { nombre, apellido, pago, tipoMembresia, telefono, dni } =
       req.body;
 
@@ -140,14 +139,12 @@ export const actualizarUsuario = async (req, res) => {
         return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
       }
 
-    // Buscamos y actualizamos en un solo paso (más eficiente)
     const usuarioActualizado = await UsuarioData.findByIdAndUpdate(
       id,
       { nombre, apellido, pago, tipoMembresia, telefono, dni },
       { new: true, runValidators: true }
     );
 
-    // Si no encuentra nada, devuelve null
     if (!usuarioActualizado) {
       return res.status(404).json({ mensaje: "Usuario no encontrado" });
     }
@@ -159,7 +156,6 @@ export const actualizarUsuario = async (req, res) => {
   } catch (error) {
     console.error(error);
 
-    // CORRECCIÓN IMPORTANTE: Primero verificamos el error específico
     if (error.code === 11000) {
       return res.status(400).json({
         mensaje: "El email o DNI ingresado ya pertenece a otro usuario.",
@@ -190,29 +186,23 @@ export const eliminarUsuario = async (req, res) => {
 
 export const renovarUsuario = async (req, res) => {
   try {
-    // 1. Recibimos DNI y datos de pago
     const { dni, pago, tipoMembresia } = req.body;
 
-    // Validación de datos obligatorios
     if (!dni || !pago || !tipoMembresia) {
       return res.status(400).json({ mensaje: "Faltan datos obligatorios (dni, pago, tipoMembresia)" });
     }
 
-    // 2. Buscamos al usuario por DNI
     const usuario = await UsuarioData.findOne({ dni });
     
     if (!usuario) {
       return res.status(404).json({ mensaje: "Usuario no encontrado con ese DNI" });
     }
 
-    // 3. LÓGICA DE FECHAS (INTELIGENTE)
     const hoy = new Date();
     const vencimientoActual = new Date(usuario.fechaVencimiento);
     
-    // Si ya venció, sumamos desde HOY. Si le quedan días, sumamos a su Vencimiento.
     let fechaBaseCalculo = (vencimientoActual < hoy) ? hoy : vencimientoActual;
     
-    // Calculamos la nueva fecha
     const nuevaFechaVencimiento = new Date(fechaBaseCalculo);
 
     switch (tipoMembresia) {
@@ -236,6 +226,7 @@ export const renovarUsuario = async (req, res) => {
             dni: usuario.dni,
             pago: pago,
             tipoMembresia: tipoMembresia,
+            usuarioId: usuario._id,
             estado: "activo",
             fechaInicio: new Date(),
             fechaVencimiento: nuevaFechaVencimiento

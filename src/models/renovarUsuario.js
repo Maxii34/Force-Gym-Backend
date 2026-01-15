@@ -37,6 +37,11 @@ const renovacionSchema = new Schema(
       type: Date,
       required: true,
     },
+    usuarioId: {
+      type: Schema.Types.ObjectId,
+      ref: "usuarioData",
+      required: true,
+    }
   },
   {
     timestamps: true,
