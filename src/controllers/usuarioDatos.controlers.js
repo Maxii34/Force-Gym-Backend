@@ -1,5 +1,4 @@
 import UsuarioData from "../models/usuarioDatos.js";
-import Renovacion from "../models/renovarUsuario.js";
 
 // Ingreso de usuarios
 export const ingresoUsuarios = async (req, res) => {
@@ -184,77 +183,3 @@ export const eliminarUsuario = async (req, res) => {
   }
 };
 
-export const renovarUsuario = async (req, res) => {
-  try {
-    const { dni, pago, tipoMembresia } = req.body;
-
-    if (!dni || !pago || !tipoMembresia) {
-      return res.status(400).json({ mensaje: "Faltan datos obligatorios (dni, pago, tipoMembresia)" });
-    }
-
-    const usuario = await UsuarioData.findOne({ dni });
-    
-    if (!usuario) {
-      return res.status(404).json({ mensaje: "Usuario no encontrado con ese DNI" });
-    }
-
-    const hoy = new Date();
-    const vencimientoActual = new Date(usuario.fechaVencimiento);
-    
-    let fechaBaseCalculo = (vencimientoActual < hoy) ? hoy : vencimientoActual;
-    
-    const nuevaFechaVencimiento = new Date(fechaBaseCalculo);
-
-    switch (tipoMembresia) {
-      case "mensual":
-        nuevaFechaVencimiento.setMonth(nuevaFechaVencimiento.getMonth() + 1);
-        break;
-      case "trimestral":
-        nuevaFechaVencimiento.setMonth(nuevaFechaVencimiento.getMonth() + 3);
-        break;
-      case "semestral":
-        nuevaFechaVencimiento.setMonth(nuevaFechaVencimiento.getMonth() + 6);
-        break;
-      case "anual":
-        nuevaFechaVencimiento.setFullYear(nuevaFechaVencimiento.getFullYear() + 1);
-        break;
-      default:
-        return res.status(400).json({ mensaje: "Tipo de membresía no válido" });
-    }
-    try {
-        const nuevaRenovacion = new Renovacion({
-            dni: usuario.dni,
-            pago: pago,
-            tipoMembresia: tipoMembresia,
-            usuarioId: usuario._id,
-            estado: "activo",
-            fechaInicio: new Date(),
-            fechaVencimiento: nuevaFechaVencimiento
-        });
-        await nuevaRenovacion.save();
-    } catch (historialError) {
-        console.log("Error al guardar historial, pero seguimos con la renovación:", historialError);
-    }
-
-    const usuarioRenovado = await UsuarioData.findByIdAndUpdate(
-      usuario._id, 
-      {
-        pago, 
-        tipoMembresia,
-        fechaVencimiento: nuevaFechaVencimiento,
-        estado: "activo" 
-      },
-      { new: true, runValidators: true }
-    );
-
-    res.status(200).json({
-      mensaje: "Usuario renovado exitosamente",
-      usuario: usuarioRenovado,
-      vencimiento: nuevaFechaVencimiento
-    });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ mensaje: "Error al renovar el usuario" });
-  }
-};
