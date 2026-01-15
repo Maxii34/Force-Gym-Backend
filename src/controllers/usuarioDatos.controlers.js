@@ -251,7 +251,7 @@ export const renovarUsuario = async (req, res) => {
         pago, 
         tipoMembresia,
         fechaVencimiento: nuevaFechaVencimiento,
-        estado: true 
+        estado: "activo" 
       },
       { new: true, runValidators: true }
     );

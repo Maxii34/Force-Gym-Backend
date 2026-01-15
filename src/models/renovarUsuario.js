@@ -26,6 +26,7 @@ const renovacionSchema = new Schema(
         tipoMembresia: {
       type: String,
       enum: ['mensual', 'trimestral', 'semestral', 'anual'],
+      default: 'mensual',
       required: true
     },
     fechaInicio: {
