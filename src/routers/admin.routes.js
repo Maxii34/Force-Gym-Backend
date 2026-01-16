@@ -3,7 +3,7 @@ import { crearAdministrador, iniciarSesion, editarAdministrador } from "../contr
 
 const router = Router();
 
-//http://localhost:3000/api/admin
+//http://localhost:3000/api/admin/crear
 router.post("/crear", crearAdministrador);
 
 //http://localhost:3000/api/admin/login
