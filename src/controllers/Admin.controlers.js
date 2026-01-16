@@ -1,5 +1,5 @@
-import { generarJWT } from "../middlewares/generarJWT";
-import Administrador from "../models/administrador";
+import { generarJWT } from "../middlewares/generarJWT.js";
+import Administrador from "../models/administrador.js";
 import bcrypt from "bcrypt";
 
 // Crear admin por unica vez
@@ -75,13 +75,7 @@ export const iniciarSesion = async (req, res) => {
     const token = generarJWT(adminExistente._id);
     res.status(200).json({
       mensaje: "Inicio de sesión exitoso",
-      usuario: {
-        id: adminExistente._id,
-        nombre: adminExistente.nombre,
-        apellido: adminExistente.apellido,
-        email: adminExistente.email,
-        rol: adminExistente.rol,
-      },
+      usuario: adminExistente,
       token,
     });
   } catch (error) {
