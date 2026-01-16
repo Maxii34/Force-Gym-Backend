@@ -7,6 +7,11 @@ const administradorSchema = new Schema(
       required: true,
       trim: true,
     },
+    apellido: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     email: {
       type: String,
       required: true,
@@ -36,6 +41,12 @@ const administradorSchema = new Schema(
     timestamps: true,
   },
 );
+// Método para ocultar la contraseña al devolver datos del administrador
+administradorSchema.methods.toJSON = function() {
+  const administrador = this.toObject();
+  delete administrador.password;
+  return administrador;
+};
 
 const Administrador = mongoose.model('Administrador', administradorSchema);
 
