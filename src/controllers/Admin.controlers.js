@@ -89,3 +89,43 @@ export const iniciarSesion = async (req, res) => {
     res.status(500).json({ mensaje: "Error al iniciar sesión" });
   }
 };
+
+export const editarAdministrador = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, apellido, email, password } = req.body;
+
+    // 1. Buscamos al admin por ID primero
+    const admin = await Administrador.findById(id);
+    if (!admin) {
+      return res.status(404).json({ mensaje: "Administrador no encontrado" });
+    }
+
+    // 2. Actualizamos datos básicos si vienen en el body
+    admin.nombre = nombre || admin.nombre;
+    admin.apellido = apellido || admin.apellido;
+    admin.email = email || admin.email;
+
+    // Solo si el usuario envió algo en el campo password, se encripta 
+    if (password) {
+      const saltos = await bcrypt.genSalt(10);
+      admin.password = await bcrypt.hash(password, saltos);
+    }
+
+    await admin.save();
+
+    res.status(200).json({
+      mensaje: "Administrador actualizado exitosamente",
+      usuario: {
+        id: admin._id,
+        nombre: admin.nombre,
+        email: admin.email,
+        rol: admin.rol
+      }
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al editar el administrador" });
+  }
+};
