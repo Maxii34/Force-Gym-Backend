@@ -1,6 +1,6 @@
 import { body } from "express-validator";
-import UsuarioData from "../models/UsuarioData.js";
 import resultadoValidacion from "./resultadoValidacion.js";
+import UsuarioData from "../models/usuarioDatos.js";
 
 
 export const validarUsuario = [
@@ -37,14 +37,17 @@ export const validarUsuario = [
     .withMessage("El DNI solo debe contener números")
     .isLength({ min: 7, max: 9 })
     .withMessage("El DNI debe tener entre 7 y 9 dígitos")
-    .custom(async (value) => {
-      // Se busca si ya existe alguien con ese DNI
-      const usuarioExistente = await UsuarioData.findOne({ dni: value });
-      if (usuarioExistente) {
-        throw new Error("El DNI ya se encuentra registrado en el sistema");
-      }
-      return true;
-    }), 
+    .custom(async (value, { req }) => { 
+        // Buscamos si existe alguien con ese DNI
+        const usuarioExistente = await UsuarioData.findOne({ dni: value });
+
+        if (usuarioExistente) {
+            if (usuarioExistente._id.toString() !== req.params.id) {
+                throw new Error("El DNI ya se encuentra registrado en el sistema");
+            }
+        }
+        return true;
+    }),
 
   body("pago")
     .notEmpty()
@@ -60,25 +63,6 @@ export const validarUsuario = [
       "El tipo de membresía no es válido (mensual, trimestral, semestral, anual)"
     ),
 
-  body("fechaVencimiento")
-    .notEmpty()
-    .withMessage("La fecha de vencimiento es obligatoria")
-    .isISO8601()
-    .toDate()
-    .withMessage("Formato de fecha inválido")
-    .custom((value, { req }) => {
-      const fechaVenc = new Date(value);
-      const fechaInicio = req.body.fechaInicio
-        ? new Date(req.body.fechaInicio)
-        : new Date();
-
-      if (fechaVenc <= fechaInicio) {
-        throw new Error(
-          "La fecha de vencimiento debe ser posterior a la fecha de inicio"
-        );
-      }
-      return true;
-    }),
 
   body("estado")
     .optional()

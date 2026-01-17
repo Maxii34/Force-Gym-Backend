@@ -10,6 +10,8 @@ import {
 import { renovarUsuario } from "../controllers/renovacion.controlers.js";
 import { validarToken } from "../middlewares/validarToken.js";
 import { validarUsuario } from "../middlewares/validacionUsuarios.js";
+import { validarRenovacion } from "../middlewares/validacionRenovacion.js";
+
 
 const router = Router();
 
@@ -20,7 +22,7 @@ router
   .get(listarUsuarios);
 
 //http://localhost:3000/api/usuarios/ingreso
-router.route("/ingreso").post(validarUsuario, ingresoUsuarios);
+router.route("/ingreso").post(ingresoUsuarios);
 
 //http://localhost:3000/api/usuarios/:id
 router
@@ -32,6 +34,6 @@ router
 //http://localhost:3000/api/usuarios/renovar/:id
 router
   .route("/renovar/:id")
-  .post([validarToken, validarUsuario], renovarUsuario);
+  .post([validarToken, validarRenovacion], renovarUsuario);
 
 export default router;
