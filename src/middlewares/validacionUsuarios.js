@@ -3,7 +3,7 @@ import UsuarioData from "../models/UsuarioData.js";
 import resultadoValidacion from "./resultadoValidacion.js";
 
 
-export const validarCreacionUsuario = [
+export const validarUsuario = [
   body("nombre")
     .trim()
     .notEmpty()
