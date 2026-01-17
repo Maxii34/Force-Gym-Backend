@@ -1,6 +1,7 @@
 import { body } from "express-validator";
 import resultadoValidacion from "./resultadoValidacion.js";
 import Renovacion from "../models/renovarUsuario.js";
+import UsuarioData from "../models/usuarioDatos.js";
 
 export const validarRenovacion = [
   body("dni")
@@ -10,25 +11,13 @@ export const validarRenovacion = [
     .isNumeric()
     .withMessage("El DNI solo debe contener números")
     .isLength({ min: 7, max: 9 })
-    .withMessage("El DNI debe tener entre 7 y 9 dígitos") 
+    .withMessage("El DNI debe tener entre 7 y 9 dígitos")
     .custom(async (value) => {
       // 1. Validar que el cliente EXISTA en la base de datos de usuarios
       const usuario = await UsuarioData.findOne({ dni: value });
       if (!usuario) {
         throw new Error("El DNI no pertenece a ningún socio registrado");
       }
-
-      // 2. Validar que no tenga una membresía ACTIVA vigente.
-      // Buscar si tiene una renovación donde la fecha de vencimiento sea mayor a hoy.
-      const membresiaActiva = await Renovacion.findOne({
-        dni: value,
-        fechaVencimiento: { $gt: new Date() },
-      });
-
-      if (membresiaActiva) {
-        throw new Error("Este usuario ya tiene una membresía activa vigente");
-      }
-      return true;
     }),
   body("pago")
     .notEmpty()
