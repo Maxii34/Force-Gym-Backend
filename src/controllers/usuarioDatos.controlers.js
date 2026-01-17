@@ -43,7 +43,7 @@ export const ingresoUsuarios = async (req, res) => {
     console.error(error);
     res
       .status(500)
-      .json({ mensaje: "Error al ingresar el usuario en el servidor", error });
+      .json({ mensaje: "Error al ingresar el usuario en el servidor" });
   }
 };
 

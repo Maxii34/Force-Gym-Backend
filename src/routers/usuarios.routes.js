@@ -19,7 +19,7 @@ const router = Router();
 router
   .route("/")
   .post([validarToken, validarUsuario], crearUsuarios)
-  .get(listarUsuarios);
+  .get(validarToken, listarUsuarios);
 
 //http://localhost:3000/api/usuarios/ingreso
 router.route("/ingreso").post(ingresoUsuarios);
