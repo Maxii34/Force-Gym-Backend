@@ -19,7 +19,7 @@ export const validarRenovacion = [
         throw new Error("El DNI no pertenece a ningún socio registrado");
       }
     }),
-  body("pago")
+  body("pagoMensual")
     .notEmpty()
     .withMessage("El monto del pago es obligatorio")
     .isFloat({ min: 0 })

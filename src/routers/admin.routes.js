@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { crearAdministrador, iniciarSesion, editarAdministrador } from "../controllers/Admin.controlers.js";
-import validarToken from "../middlewares/validarToken.js";
+import { validarToken } from "../middlewares/validarToken.js";
 
 const router = Router();
 

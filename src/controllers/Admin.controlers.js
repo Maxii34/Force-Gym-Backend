@@ -66,7 +66,7 @@ export const iniciarSesion = async (req, res) => {
 
     const passwordCorrecta = await bcrypt.compare(
       password,
-      adminExistente.password
+      adminExistente.password,
     );
     if (!passwordCorrecta) {
       return res.status(401).json({ mensaje: "Contraseña incorrecta" });
@@ -100,7 +100,7 @@ export const editarAdministrador = async (req, res) => {
     admin.apellido = apellido || admin.apellido;
     admin.email = email || admin.email;
 
-    // Solo si el usuario envió algo en el campo password, se encripta 
+    // Solo si el usuario envió algo en el campo password, se encripta
     if (password) {
       const saltos = await bcrypt.genSalt(10);
       admin.password = await bcrypt.hash(password, saltos);
@@ -114,12 +114,21 @@ export const editarAdministrador = async (req, res) => {
         id: admin._id,
         nombre: admin.nombre,
         email: admin.email,
-        rol: admin.rol
-      }
+        rol: admin.rol,
+      },
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ mensaje: "Error al editar el administrador" });
+  }
+};
+
+export const listarAdministradores = async (req, res) => {
+  try {
+    const listarAdmin = await Administrador.find().select("-password");
+    res.status(200).json(listarAdmin);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al listar los administradores" });
   }
 };

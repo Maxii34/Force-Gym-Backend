@@ -13,7 +13,7 @@ const renovacionSchema = new Schema(
         message: "El DNI solo debe contener números",
       },
     },
-    pago: {
+    pagoMensual: {
       type: Number,
       required: true,
       min: 0,

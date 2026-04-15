@@ -50,8 +50,8 @@ export const ingresoUsuarios = async (req, res) => {
 // Crear nuevos usuarios
 export const crearUsuarios = async (req, res) => {
   try {
-    const { dni, nombre, apellido, pago, tipoMembresia, telefono } = req.body;
-    if (!dni || !nombre || !apellido || !pago || !tipoMembresia || !telefono) {
+    const { dni, nombre, apellido, pagoMensual, tipoMembresia, telefono } = req.body;
+    if (!dni || !nombre || !apellido || !pagoMensual || !tipoMembresia || !telefono) {
       return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
     }
     const usuarioExistente = await UsuarioData.findOne({ dni });
@@ -83,7 +83,7 @@ export const crearUsuarios = async (req, res) => {
       nombre,
       apellido,
       telefono,
-      pago,
+      pagoMensual,
       tipoMembresia,
       fechaInicio,
       fechaVencimiento,
@@ -131,16 +131,16 @@ export const actualizarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { nombre, apellido, pago, tipoMembresia, telefono, dni } =
+    const { nombre, apellido, pagoMensual, tipoMembresia, telefono, dni } =
       req.body;
 
-      if (!dni || !nombre || !apellido || !pago || !tipoMembresia || !telefono) {
+      if (!dni || !nombre || !apellido || !pagoMensual || !tipoMembresia || !telefono) {
         return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
       }
 
     const usuarioActualizado = await UsuarioData.findByIdAndUpdate(
       id,
-      { nombre, apellido, pago, tipoMembresia, telefono, dni },
+      { nombre, apellido, pagoMensual, tipoMembresia, telefono, dni },
       { new: true, runValidators: true }
     );
 

@@ -25,11 +25,11 @@ const calcularVencimiento = (fechaBase, tipo) => {
 
 export const renovarUsuario = async (req, res) => {
   try {
-    const { dni, pago, tipoMembresia } = req.body;
+    const { dni, pagoMensual, tipoMembresia } = req.body;
 
-    if (!dni || !pago || !tipoMembresia) {
+    if (!dni || !pagoMensual || !tipoMembresia) {
       return res.status(400).json({
-        mensaje: "Faltan datos obligatorios (dni, pago, tipoMembresia)",
+        mensaje: "Faltan datos obligatorios (dni, pagoMensual, tipoMembresia)",
       });
     }
 
@@ -57,7 +57,7 @@ export const renovarUsuario = async (req, res) => {
     //Crear y Guardar la Renovación 
     const nuevaRenovacion = new Renovacion({
       dni: usuario.dni,
-      pago: pago,
+      pagoMensual: pagoMensual,
       tipoMembresia: tipoMembresia,
       usuarioId: usuario._id,
       estado: "activo",
@@ -71,7 +71,7 @@ export const renovarUsuario = async (req, res) => {
     const usuarioRenovado = await UsuarioData.findByIdAndUpdate(
       usuario._id,
       {
-        pago,
+        pagoMensual,
         tipoMembresia,
         fechaVencimiento: nuevaFechaVencimiento,
         estado: "activo",
