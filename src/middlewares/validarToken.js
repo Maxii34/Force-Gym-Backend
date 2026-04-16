@@ -15,6 +15,7 @@ export const validarToken = (req, res, next) => {
     }
     const payload = jwt.verify(token, process.env.SECRETO_JWT);
     req.usuario = payload.id;
+    req.rol = payload.rol;
     next();
   } catch (error) {
     console.error(error);

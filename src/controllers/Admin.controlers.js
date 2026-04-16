@@ -72,7 +72,7 @@ export const iniciarSesion = async (req, res) => {
       return res.status(401).json({ mensaje: "Contraseña incorrecta" });
     }
 
-    const token = generarJWT(adminExistente._id);
+    const token = generarJWT(adminExistente._id, adminExistente.rol);
     res.status(200).json({
       mensaje: "Inicio de sesión exitoso",
       usuario: adminExistente,
