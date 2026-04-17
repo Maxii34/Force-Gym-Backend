@@ -5,24 +5,28 @@ import bcrypt from "bcrypt";
 // Crear admin por unica vez
 export const crearAdministrador = async (req, res) => {
   try {
-    const { nombre, apellido, email, password } = req.body;
+    const { nombre, apellido, email, password, rol } = req.body;
     // Validar datos obligatorios
-    if (!nombre || !apellido || !email || !password) {
+    if (!nombre || !apellido || !email || !password || !rol) {
       return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
     }
 
-    // Verificar si ya existe un administrador
-    const adminExistente = await Administrador.findOne({ rol: "admin" });
-    if (adminExistente) {
-      return res.status(400).json({
-        mensaje:
-          "El sistema ya tiene un administrador. No se puede crear otro.",
+    // Verificar si se intenta crear un superadmin y si ya existe uno
+    if (rol === "superadmin") {
+      const superadminExistente = await Administrador.findOne({
+        rol: "superadmin",
       });
+      if (superadminExistente) {
+        return res.status(400).json({
+          mensaje:
+            "El sistema ya tiene un superadministrador. No se puede crear otro.",
+        });
+      }
     }
 
     // Encriptar la contraseña
     const saltos = await bcrypt.genSalt(10);
-    const passwordEncriptada = await bcrypt.hash(req.body.password, saltos);
+    const passwordEncriptada = await bcrypt.hash(password, saltos);
 
     // Crear el nuevo administrador
     const nuevoAdministrador = new Administrador({
@@ -30,7 +34,7 @@ export const crearAdministrador = async (req, res) => {
       apellido,
       email,
       password: passwordEncriptada,
-      rol: "admin",
+      rol,
     });
     // Guardar en la base de datos
     await nuevoAdministrador.save();
@@ -66,13 +70,13 @@ export const iniciarSesion = async (req, res) => {
 
     const passwordCorrecta = await bcrypt.compare(
       password,
-      adminExistente.password
+      adminExistente.password,
     );
     if (!passwordCorrecta) {
       return res.status(401).json({ mensaje: "Contraseña incorrecta" });
     }
 
-    const token = generarJWT(adminExistente._id);
+    const token = generarJWT(adminExistente._id, adminExistente.rol);
     res.status(200).json({
       mensaje: "Inicio de sesión exitoso",
       usuario: adminExistente,
@@ -100,7 +104,7 @@ export const editarAdministrador = async (req, res) => {
     admin.apellido = apellido || admin.apellido;
     admin.email = email || admin.email;
 
-    // Solo si el usuario envió algo en el campo password, se encripta 
+    // Solo si el usuario envió algo en el campo password, se encripta
     if (password) {
       const saltos = await bcrypt.genSalt(10);
       admin.password = await bcrypt.hash(password, saltos);
@@ -114,12 +118,60 @@ export const editarAdministrador = async (req, res) => {
         id: admin._id,
         nombre: admin.nombre,
         email: admin.email,
-        rol: admin.rol
-      }
+        rol: admin.rol,
+      },
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ mensaje: "Error al editar el administrador" });
+  }
+};
+
+export const listarAdministradores = async (req, res) => {
+  try {
+    const listarAdmin = await Administrador.find().select("-password");
+    res.status(200).json(listarAdmin);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al listar los administradores" });
+  }
+};
+
+export const deleteuserRol = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const admin = await Administrador.findById(id);
+    if (!admin) {
+      return res.status(404).json({ mensaje: "Administrador no encontrado" });
+    }
+
+    // Verificar si se intenta eliminar un superadmin y si ya existe uno
+    if (admin.rol === "superadmin") {
+      const superadminExistente = await Administrador.findOne({
+        rol: "superadmin",
+      });
+      if (superadminExistente) {
+        return res.status(400).json({
+          mensaje: "No se puede eliminar el unico superadmin, del sistema.",
+        });
+      }
+    }
+
+    await Administrador.findByIdAndDelete(id);
+    res.status(200).json({ mensaje: "Administrador eliminado exitosamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al eliminar el administrador" });
+  }
+};
+
+
+export const listarAdmin = async (req, res) => {
+  try {
+    const listarAdmin = await Administrador.find().select("-password");
+    res.status(200).json(listarAdmin);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al listar los administradores" });
   }
 };

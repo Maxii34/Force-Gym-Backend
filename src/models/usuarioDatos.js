@@ -17,11 +17,25 @@ const usuarioSchema = new Schema(
       maxLength: 50,
     },
     telefono: {
+      optional: true,
       type: String,
-      required: true,
       trim: true,
       match: [/^\+?[0-9\s-]{7,15}$/, "El teléfono no es válido"],
     },
+    email: {
+      optional: true,
+      type: String,
+      sparse: true,
+      trim: true,
+      lowercase: true,
+      validate: {
+        validator: function (v) {
+          return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v);
+        },
+        message: "El email no es válido",
+      },
+    },
+
     dni: {
       type: String,
       required: true,
@@ -35,37 +49,34 @@ const usuarioSchema = new Schema(
         message: "El DNI solo debe contener números",
       },
     },
-    pago: {
+    pagoMensual: {
       type: Number,
       required: true,
-      min: 0, 
+      min: 0,
     },
     estado: {
       type: String,
-      enum: ['activo', 'inactivo', 'suspendido'],
-      default: 'activo'
+      enum: ["activo", "inactivo", "suspendido"],
+      default: "activo",
     },
     fechaInicio: {
       type: Date,
-      default: Date.now
+      default: Date.now,
     },
     fechaVencimiento: {
       type: Date,
-      required: true
+      required: true,
     },
     tipoMembresia: {
       type: String,
-      enum: ['mensual', 'trimestral', 'semestral', 'anual'],
-      required: true
-    }
+      enum: ["mensual", "trimestral", "semestral", "anual"],
+      required: true,
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
-
-// Índice para consultas frecuentes por DNI
-usuarioSchema.index({ dni: 1 });
 
 const UsuarioData = mongoose.model("UsuarioData", usuarioSchema);
 

@@ -11,29 +11,30 @@ import { renovarUsuario } from "../controllers/renovacion.controlers.js";
 import { validarToken } from "../middlewares/validarToken.js";
 import { validarUsuario } from "../middlewares/validacionUsuarios.js";
 import { validarRenovacion } from "../middlewares/validacionRenovacion.js";
-
+import { permitirRoles } from "../controllers/permisos.js";
 
 const router = Router();
 
 //http://localhost:3000/api/usuarios
 router
   .route("/")
-  .post([validarToken, validarUsuario], crearUsuarios)
+  .post([validarToken, validarUsuario, permitirRoles(["admin", "superadmin"])], crearUsuarios)
   .get(validarToken, listarUsuarios);
 
 //http://localhost:3000/api/usuarios/ingreso
+//Ruta publica de usuarios
 router.route("/ingreso").post(ingresoUsuarios);
-
-//http://localhost:3000/api/usuarios/:id
-router
-  .route("/:id")
-  .get(validarToken, obtenerUsuario)
-  .put([validarToken, validarUsuario], actualizarUsuario)
-  .delete(validarToken, eliminarUsuario);
 
 //http://localhost:3000/api/usuarios/renovar/:id
 router
   .route("/renovar/:id")
-  .post([validarToken, validarRenovacion], renovarUsuario);
+  .post([validarToken, validarRenovacion, permitirRoles(["admin", "superadmin", "moderador"])], renovarUsuario);
+
+//http://localhost:3000/api/usuarios/:id
+router
+  .route("/:id")
+  .get([validarToken, permitirRoles(["admin", "superadmin", "moderador"])], obtenerUsuario)
+  .put([validarToken, validarUsuario, permitirRoles(["admin", "superadmin"])], actualizarUsuario)
+  .delete([validarToken, permitirRoles(["admin", "superadmin"])], eliminarUsuario);
 
 export default router;

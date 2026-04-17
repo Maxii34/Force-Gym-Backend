@@ -1,10 +1,16 @@
 import UsuarioData from "../models/usuarioDatos.js";
+import Ingreso from "../models/ingreso.js";
 
 // Ingreso de usuarios
 export const ingresoUsuarios = async (req, res) => {
   try {
     const { dni } = req.body;
 
+    if (!dni) {
+      return res.status(400).json({ mensaje: "El DNI es obligatorio" });
+    }
+
+    // 1. Buscar usuario
     const usuarioExistente = await UsuarioData.findOne({ dni });
 
     if (!usuarioExistente) {
@@ -13,14 +19,16 @@ export const ingresoUsuarios = async (req, res) => {
         .json({ mensaje: "El usuario con este DNI no existe" });
     }
 
-    const fechaIngreso = new Date();
+    const fechaActual = new Date();
     const fechaVencimiento = new Date(usuarioExistente.fechaVencimiento);
 
-    if (fechaIngreso > fechaVencimiento) {
+    // 2. Validar vencimiento
+    if (fechaActual > fechaVencimiento) {
       if (usuarioExistente.estado === "activo") {
         usuarioExistente.estado = "inactivo";
         await usuarioExistente.save();
       }
+
       return res.status(403).json({
         acceso: false,
         mensaje:
@@ -29,29 +37,69 @@ export const ingresoUsuarios = async (req, res) => {
       });
     }
 
-    if (usuarioExistente.estado === "activo") {
-      return res.status(200).json({
-        acceso: true,
-        usuario: usuarioExistente,
-        mensaje: "Bienvenido, acceso permitido",
+    // 3. Validar estado
+    if (usuarioExistente.estado !== "activo") {
+      return res.status(403).json({
+        acceso: false,
+        mensaje: "El usuario no está activo",
       });
     }
-    return res
-      .status(403)
-      .json({ acceso: false, mensaje: "El usuario no está activo" });
+
+    // 4. Evitar doble ingreso en el mismo día
+    const inicioDelDia = new Date();
+    inicioDelDia.setHours(0, 0, 0, 0);
+
+    const yaIngresoHoy = await Ingreso.findOne({
+      usuarioId: usuarioExistente._id,
+      fechaIngreso: { $gte: inicioDelDia },
+    });
+
+    let ingresoGuardado = null;
+
+    if (!yaIngresoHoy) {
+      ingresoGuardado = await Ingreso.create({
+        usuarioId: usuarioExistente._id,
+        dni: usuarioExistente.dni,
+      });
+    }
+
+    // 5. Respuesta
+    return res.status(200).json({
+      acceso: true,
+      mensaje: yaIngresoHoy
+        ? "Ingreso ya registrado hoy"
+        : "Bienvenido, ingreso registrado",
+      usuario: {
+        nombre: usuarioExistente.nombre,
+        apellido: usuarioExistente.apellido,
+        tipoMembresia: usuarioExistente.tipoMembresia,
+        fechaVencimiento: usuarioExistente.fechaVencimiento,
+      },
+      ingreso: ingresoGuardado || yaIngresoHoy,
+    });
+
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ mensaje: "Error al ingresar el usuario en el servidor" });
+    res.status(500).json({
+      mensaje: "Error al ingresar el usuario en el servidor",
+      error: error.message,
+    });
   }
 };
 
 // Crear nuevos usuarios
 export const crearUsuarios = async (req, res) => {
   try {
-    const { dni, nombre, apellido, pago, tipoMembresia, telefono } = req.body;
-    if (!dni || !nombre || !apellido || !pago || !tipoMembresia || !telefono) {
+    const { dni, nombre, apellido, pagoMensual, tipoMembresia, telefono } =
+      req.body;
+    if (
+      !dni ||
+      !nombre ||
+      !apellido ||
+      !pagoMensual ||
+      !tipoMembresia ||
+      !telefono
+    ) {
       return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
     }
     const usuarioExistente = await UsuarioData.findOne({ dni });
@@ -83,7 +131,7 @@ export const crearUsuarios = async (req, res) => {
       nombre,
       apellido,
       telefono,
-      pago,
+      pagoMensual,
       tipoMembresia,
       fechaInicio,
       fechaVencimiento,
@@ -131,17 +179,24 @@ export const actualizarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { nombre, apellido, pago, tipoMembresia, telefono, dni } =
+    const { nombre, apellido, pagoMensual, tipoMembresia, telefono, dni } =
       req.body;
 
-      if (!dni || !nombre || !apellido || !pago || !tipoMembresia || !telefono) {
-        return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
-      }
+    if (
+      !dni ||
+      !nombre ||
+      !apellido ||
+      !pagoMensual ||
+      !tipoMembresia ||
+      !telefono
+    ) {
+      return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
+    }
 
     const usuarioActualizado = await UsuarioData.findByIdAndUpdate(
       id,
-      { nombre, apellido, pago, tipoMembresia, telefono, dni },
-      { new: true, runValidators: true }
+      { nombre, apellido, pagoMensual, tipoMembresia, telefono, dni },
+      { new: true, runValidators: true },
     );
 
     if (!usuarioActualizado) {
@@ -182,4 +237,3 @@ export const eliminarUsuario = async (req, res) => {
     res.status(500).json({ mensaje: "Error al eliminar el usuario" });
   }
 };
-

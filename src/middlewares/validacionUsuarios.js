@@ -49,7 +49,7 @@ export const validarUsuario = [
         return true;
     }),
 
-  body("pago")
+  body("pagoMensual")
     .notEmpty()
     .withMessage("El monto del pago es obligatorio")
     .isFloat({ min: 0 })

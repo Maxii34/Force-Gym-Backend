@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 
-export const generarJWT = (id) => {
+export const generarJWT = (id, rol) => {
     try {
-        const payload = { id };
+        const payload = { id, rol };
         const token = jwt.sign(payload, process.env.SECRETO_JWT, {
             expiresIn: '30m',
         });
