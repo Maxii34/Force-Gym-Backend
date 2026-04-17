@@ -5,24 +5,25 @@ import bcrypt from "bcrypt";
 // Crear admin por unica vez
 export const crearAdministrador = async (req, res) => {
   try {
-    const { nombre, apellido, email, password } = req.body;
+    const { nombre, apellido, email, password, rol } = req.body;
     // Validar datos obligatorios
-    if (!nombre || !apellido || !email || !password) {
+    if (!nombre || !apellido || !email || !password || !rol) {
       return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
     }
 
-    // Verificar si ya existe un administrador
-    const adminExistente = await Administrador.findOne({ rol: "admin" });
-    if (adminExistente) {
-      return res.status(400).json({
-        mensaje:
-          "El sistema ya tiene un administrador. No se puede crear otro.",
-      });
+    // Verificar si se intenta crear un superadmin y si ya existe uno
+    if (rol === "superadmin") {
+      const superadminExistente = await Administrador.findOne({ rol: "superadmin" });
+      if (superadminExistente) {
+        return res.status(400).json({
+          mensaje: "El sistema ya tiene un superadministrador. No se puede crear otro.",
+        });
+      }
     }
 
     // Encriptar la contraseña
     const saltos = await bcrypt.genSalt(10);
-    const passwordEncriptada = await bcrypt.hash(req.body.password, saltos);
+    const passwordEncriptada = await bcrypt.hash(password, saltos);
 
     // Crear el nuevo administrador
     const nuevoAdministrador = new Administrador({
@@ -30,7 +31,7 @@ export const crearAdministrador = async (req, res) => {
       apellido,
       email,
       password: passwordEncriptada,
-      rol: "admin",
+      rol,
     });
     // Guardar en la base de datos
     await nuevoAdministrador.save();
