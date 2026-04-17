@@ -13,10 +13,13 @@ export const crearAdministrador = async (req, res) => {
 
     // Verificar si se intenta crear un superadmin y si ya existe uno
     if (rol === "superadmin") {
-      const superadminExistente = await Administrador.findOne({ rol: "superadmin" });
+      const superadminExistente = await Administrador.findOne({
+        rol: "superadmin",
+      });
       if (superadminExistente) {
         return res.status(400).json({
-          mensaje: "El sistema ya tiene un superadministrador. No se puede crear otro.",
+          mensaje:
+            "El sistema ya tiene un superadministrador. No se puede crear otro.",
         });
       }
     }
@@ -125,6 +128,45 @@ export const editarAdministrador = async (req, res) => {
 };
 
 export const listarAdministradores = async (req, res) => {
+  try {
+    const listarAdmin = await Administrador.find().select("-password");
+    res.status(200).json(listarAdmin);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al listar los administradores" });
+  }
+};
+
+export const deleteuserRol = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const admin = await Administrador.findById(id);
+    if (!admin) {
+      return res.status(404).json({ mensaje: "Administrador no encontrado" });
+    }
+
+    // Verificar si se intenta eliminar un superadmin y si ya existe uno
+    if (admin.rol === "superadmin") {
+      const superadminExistente = await Administrador.findOne({
+        rol: "superadmin",
+      });
+      if (superadminExistente) {
+        return res.status(400).json({
+          mensaje: "No se puede eliminar el unico superadmin, del sistema.",
+        });
+      }
+    }
+
+    await Administrador.findByIdAndDelete(id);
+    res.status(200).json({ mensaje: "Administrador eliminado exitosamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al eliminar el administrador" });
+  }
+};
+
+
+export const listarAdmin = async (req, res) => {
   try {
     const listarAdmin = await Administrador.find().select("-password");
     res.status(200).json(listarAdmin);
