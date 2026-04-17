@@ -4,109 +4,130 @@
 ![Express.js](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge)
 ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
+![Cron](https://img.shields.io/badge/Node--Cron-FFD700?style=for-the-badge&logo=clock&logoColor=black)
 
-> **API RESTful** robusta y escalable diseñada para la gestión integral del gimnasio **ForceGim**.
+> **API RESTful** de alto rendimiento diseñada para la gestión integral del gimnasio **ForceGim**. Este sistema centraliza la administración de socios, el control de acceso, el seguimiento financiero y la automatización de membresías.
 
 ---
 
 ## 📖 Descripción
 
-Este backend gestiona la lógica de negocio completa para el control de socios y administradores. Se centra en la seguridad de datos, la autenticación mediante tokens y la automatización de procesos clave, como el cálculo de vencimientos de membresías.
+Este backend constituye el núcleo lógico de ForceGim, proporcionando una arquitectura robusta basada en **Node.js** y **Express**. Implementa un sistema de permisos avanzado (RBAC), integración flexible con **MongoDB** y una suite de herramientas de análisis para el dashboard administrativo.
 
 ### ✨ Características Principales
 
-- **Autenticación Segura:** Login de administradores con generación de **JWT**.
-- **Gestión de Socios:** CRUD completo de usuarios del gimnasio.
-- **Lógica de Negocio Automática:** Cálculo automático de la `fechaVencimiento` basado en el plan (Mensual, Trimestral, Semestral, Anual).
-- **Seguridad:** Hashing de contraseñas con **Bcrypt** y protección de rutas privadas.
-- **Validaciones:** Middleware robusto para garantizar la integridad de los datos de entrada.
+- 🔐 **Control de Acceso por Roles (RBAC):** Niveles de acceso diferenciados para `Superadmin`, `Admin` y `Moderador`.
+- 📊 **Dashboard Analítico:** Generación de estadísticas en tiempo real sobre ingresos mensuales, distribución de planes y estado de socios.
+- ⏰ **Automatización de Vencimientos:** Tarea programada (Cron Job) que verifica y desactiva automáticamente socios cuya membresía ha expirado.
+- 🛡️ **Seguridad Avanzada:** Autenticación mediante **JWT**, protección de rutas sensibles y hashing de contraseñas con **Bcrypt**.
+- 📅 **Gestión de Membresías:** Cálculos automáticos de fechas de vencimiento según el plan contratado (Mensual, Trimestral, Semestral, Anual).
 
 ---
 
 ## 🛠️ Stack Tecnológico
 
-| Tecnología                                                                                          | Propósito               |
-| :-------------------------------------------------------------------------------------------------- | :---------------------- |
-| ![NodeJS](https://img.shields.io/badge/-Node.js-339933?style=flat&logo=node.js&logoColor=white)     | Entorno de ejecución    |
-| ![Express](https://img.shields.io/badge/-Express-000000?style=flat&logo=express&logoColor=white)    | Framework de servidor   |
-| ![MongoDB](https://img.shields.io/badge/-MongoDB-47A248?style=flat&logo=mongodb&logoColor=white)    | Base de datos NoSQL     |
-| ![Mongoose](https://img.shields.io/badge/-Mongoose-880000?style=flat&logo=mongoose&logoColor=white) | Modelado de datos (ODM) |
-
----
-## 👤 Autor
-
-**[Maximiliano Exequiel Ordoñez]**
-
-*Full Stack Developer*
-
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Maxii34)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/tu-usuario)
-[![Email](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:tuemail@gmail.com)
----
-## ⚙️ Instalación y Configuración
-
-Sigue estos pasos para desplegar el proyecto localmente:
-
-### 1. Clonar el repositorio
-
-````bash
-git clone [https://github.com/tu-usuario/forcegim-backend.git](https://github.com/tu-usuario/forcegim-backend.git)
-cd forcegim-backend
-
-2.  **Instalar dependencias**
-    ```bash
-    npm install
-    ```
-
-3.  **Configurar entorno (.env)**
-    Crea un archivo `.env` en la raíz con estas variables:
-    ```env
-    PORT=4000
-    MONGODB_URI=mongodb://localhost:27017/forcegim_db
-    SECRET_JWT=tu_clave_secreta_aqui
-    ```
-
-4.  **Iniciar servidor**
-    ```bash
-    npm run dev   # Modo desarrollo
-    npm start     # Modo producción
-    ```
+| Tecnología | Propósito |
+| :--- | :--- |
+| **Node.js** | Entorno de ejecución de JavaScript plano de servidor. |
+| **Express.js** | Framework web para la gestión de rutas y middlewares. |
+| **MongoDB & Mongoose** | Base de datos NoSQL y ODM para el modelado de datos. |
+| **JSON Web Token** | Estándar para la transmisión segura de información de identidad. |
+| **Node-Cron** | Planificador de tareas para procesos automatizados. |
+| **Bcrypt** | Algoritmo de hashing para la protección de credenciales. |
 
 ---
 
-## 🔌 Endpoints
+## 👥 Sistema de Roles y Permisos
 
-### 🛡️ Admin & Auth
+| Rol | Alcance de Permisos |
+| :--- | :--- |
+| **Superadmin** | Control total. Gestión de otros administradores, eliminación de registros críticos y acceso completo a estadísticas. |
+| **Admin** | Gestión operativa. Puede registrar socios, renovar membresías, editar datos y visualizar el dashboard. |
+| **Moderador** | Soporte y Front-Desk. Puede renovar membresías, consultar datos de socios y ver estadísticas generales. |
 
-| Verbo | Endpoint | Descripción | Acceso |
+---
+
+## 🔌 Documentación de la API
+
+### 🛡️ Administración y Autenticación
+| Método | Endpoint | Descripción | Rol Mínimo |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/admin` | Crear primer Administrador | 🔐 **Privado** |
-| `POST` | `/api/admin/login` | Iniciar Sesión (Recibir Token) | 🔐 **Privado** |
-| `PUT` | `/api/admin/editar/:id` | Editar datos de Admin | 🔐 **Privado** |
+| `POST` | `/api/admin/login` | Inicio de sesión y entrega de Token | Público |
+| `POST` | `/api/admin/crear` | Registro de nuevos administradores | Superadmin |
+| `GET` | `/api/admin/listar` | Listado de todo el personal administrativo | Superadmin |
+| `PUT` | `/api/admin/editar/:id` | Actualización de datos de perfil | Superadmin |
+| `DELETE` | `/api/admin/delete/:id` | Eliminación de administradores | Superadmin |
 
 ### 👥 Gestión de Socios
-
-| Verbo | Endpoint | Descripción | Acceso |
+| Método | Endpoint | Descripción | Rol Mínimo |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/usuarios` | Listar todos los socios | 🔐 **Privado** |
-| `POST` | `/api/usuarios` | Registrar nuevo socio | 🔐 **Privado** |
-| `GET` | `/api/usuarios/:id` | Ver detalle de socio | 🔐 **Privado** |
-| `PUT` | `/api/usuarios/:id` | Actualizar membresía/datos | 🔐 **Privado** |
-| `DELETE`| `/api/usuarios/:id` | Dar de baja socio | 🔐 **Privado** |
+| `GET` | `/api/usuarios` | Listado general de socios | Admin |
+| `POST` | `/api/usuarios` | Registro de nuevo socio | Admin |
+| `GET` | `/api/usuarios/:id` | Detalle específico de un socio | Moderador |
+| `PUT` | `/api/usuarios/:id` | Actualización de perfil y membresía | Admin |
+| `DELETE` | `/api/usuarios/:id` | Baja definitiva del socio | Admin |
+| `POST` | `/api/usuarios/renovar/:id`| Renovación de plan activo | Moderador |
+| `POST` | `/api/usuarios/ingreso` | Registro de entrada (Check-in) | Público |
 
+### 📈 Estadísticas (Dashboard)
+| Método | Endpoint | Descripción | Rol Mínimo |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/stats/dashboard` | Resumen de ingresos, planes y estados | Moderador |
+
+---
+
+## ⚙️ Instalación y Configuración
+
+### 1. Requisitos Previos
+- Node.js v18+
+- MongoDB instalado o una URI de MongoDB Atlas.
+
+### 2. Pasos de Instalación
+```bash
+# Clonar repositorio
+git clone https://github.com/Maxii34/Force-Gym-Backend.git
+
+# Instalar dependencias
+npm install
+
+# Configurar variables de entorno (.env)
+PORT=3000
+MONGODB_URI=tu_uri_de_mongodb
+SECRET_JWT=tu_secreto_para_tokens
+```
+
+### 3. Ejecución
+```bash
+# Modo desarrollo
+npm run dev
+
+# Modo producción
+npm start
+```
 
 ---
 
 ## 📂 Estructura del Proyecto
 
-```bash
+```text
 src/
-├── 📂 controllers   # Lógica de negocio y respuestas
-├── 📂 database      # Configuración de MongoDB
-├── 📂 middlewares   # Validaciones y Auth (JWT)
-├── 📂 models        # Esquemas de datos (Mongoose)
-├── 📂 routes        # Definición de rutas de la API
-└── 📄 index.js      # Entry point del servidor
-````
+├── 📂 controllers   # Lógica de negocio y manejo de peticiones
+├── 📂 middlewares   # Seguridad, JWT y validaciones de esquema
+├── 📂 models        # Definiciones de esquemas de Mongoose
+├── 📂 routers       # Definición de rutas segmentadas
+├── 📂 tasks         # Tareas automatizadas (Cron Jobs)
+└── 📄 index.js      # Punto de entrada de la aplicación
+```
+
 ---
-Desarrollado en **Enero 2026**.
+
+## 👤 Autor
+
+**[Maximiliano Exequiel Ordoñez]**  
+*Full Stack Developer*
+
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Maxii34)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/tu-usuario)
+
+---
+Desarrollado con pasión y dedicación.
