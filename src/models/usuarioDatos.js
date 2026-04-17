@@ -78,9 +78,6 @@ const usuarioSchema = new Schema(
   },
 );
 
-// Índice para consultas frecuentes por DNI
-usuarioSchema.index({ dni: 1 });
-
 const UsuarioData = mongoose.model("UsuarioData", usuarioSchema);
 
 export default UsuarioData;
