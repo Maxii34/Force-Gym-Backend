@@ -28,13 +28,13 @@ router.route("/ingreso").post(ingresoUsuarios);
 //http://localhost:3000/api/usuarios/renovar/:id
 router
   .route("/renovar/:id")
-  .post([validarToken, validarRenovacion, permitirRoles(["admin", "superadmin"])], renovarUsuario);
+  .post([validarToken, validarRenovacion, permitirRoles(["admin", "superadmin", "moderador"])], renovarUsuario);
 
 //http://localhost:3000/api/usuarios/:id
 router
   .route("/:id")
-  .get([validarToken, permitirRoles(["admin", "superadmin"])], obtenerUsuario)
+  .get([validarToken, permitirRoles(["admin", "superadmin", "moderador"])], obtenerUsuario)
   .put([validarToken, validarUsuario, permitirRoles(["admin", "superadmin"])], actualizarUsuario)
-  .delete([validarToken, permitirRoles(["superadmin"])], eliminarUsuario);
+  .delete([validarToken, permitirRoles(["admin", "superadmin"])], eliminarUsuario);
 
 export default router;
