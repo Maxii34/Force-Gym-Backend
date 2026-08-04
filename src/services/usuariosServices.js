@@ -140,6 +140,12 @@ const eliminarUsuarioID = async (id) => {
   return usuario;
 };
 
+const desactivarUsuariosVencidos = async () => {
+  const hoy = new Date();
+  const resultado = await usuariosRepository.actualizarVencidos(hoy);
+  return resultado.modifiedCount;
+}
+
 export default {
   crearUsuario,
   obtenerUsuarios,
@@ -147,4 +153,5 @@ export default {
   actualizarUsuarioID,
   ingresoUsuarioDNI,
   eliminarUsuarioID,
+  desactivarUsuariosVencidos,
 };

@@ -133,3 +133,18 @@ export const eliminarUsuario = async (req, res) => {
     res.status(500).json({ mensaje: "Error al eliminar el usuario" });
   }
 };
+
+export const verificarVencimientos = async (req, res) => {
+  try {
+    const cantidadDesactivados =
+      await usuariosServices.desactivarUsuariosVencidos();
+    res.status(200)
+      .json({
+        mensaje: "Verificación de vencimientos ejecutada",
+        usuariosDesactivados: cantidadDesactivados,
+      });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Error Al verificar vencimientos" });
+  }
+};
