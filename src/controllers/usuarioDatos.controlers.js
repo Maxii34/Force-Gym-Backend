@@ -21,7 +21,8 @@ export const ingresoUsuarios = async (req, res) => {
     if (error.message === "Membresía expirada") {
       return res.status(403).json({
         acceso: false,
-        mensaje: "Membresía expirada. Por favor, renueve su membresía para ingresar.",
+        mensaje:
+          "Membresía expirada. Por favor, renueve su membresía para ingresar.",
         estado: "inactivo",
       });
     }
@@ -29,25 +30,32 @@ export const ingresoUsuarios = async (req, res) => {
       return res.status(403).json({ acceso: false, mensaje: error.message });
     }
 
-    res.status(500).json({ mensaje: "Error al ingresar el usuario en el servidor" });
+    res
+      .status(500)
+      .json({ mensaje: "Error al ingresar el usuario en el servidor" });
   }
 };
 
 export const crearUsuarios = async (req, res) => {
   try {
     const nuevoUsuario = await usuariosServices.crearUsuario(req.body);
-    res.status(201).json({ mensaje: "Usuario creado exitosamente", nuevoUsuario });
+    res
+      .status(201)
+      .json({ mensaje: "Usuario creado exitosamente", nuevoUsuario });
   } catch (error) {
     console.error(error);
 
     if (
       error.message === "Faltan datos obligatorios" ||
-      error.message === "El usuario con este DNI ya existe"
+      error.message === "El usuario con este DNI ya existe" ||
+      error.message === "Tipo de membresía no válido"
     ) {
       return res.status(400).json({ mensaje: error.message });
     }
 
-    res.status(500).json({ mensaje: "Error al crear el usuario en el servidor" });
+    res
+      .status(500)
+      .json({ mensaje: "Error al crear el usuario en el servidor" });
   }
 };
 
@@ -80,7 +88,10 @@ export const obtenerUsuario = async (req, res) => {
 export const actualizarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-    const usuarioActualizado = await usuariosServices.actualizarUsuarioID(id, req.body);
+    const usuarioActualizado = await usuariosServices.actualizarUsuarioID(
+      id,
+      req.body,
+    );
 
     res.status(200).json({
       mensaje: "Usuario actualizado exitosamente",
@@ -101,7 +112,9 @@ export const actualizarUsuario = async (req, res) => {
       });
     }
 
-    res.status(500).json({ mensaje: "Error al actualizar los datos del usuario" });
+    res
+      .status(500)
+      .json({ mensaje: "Error al actualizar los datos del usuario" });
   }
 };
 

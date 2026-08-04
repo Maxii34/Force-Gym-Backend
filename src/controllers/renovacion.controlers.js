@@ -2,7 +2,7 @@ import renovacionServices from "../services/renovacionServices.js";
 
 export const renovarUsuario = async (req, res) => {
   try {
-    const resultado = await renovacionesServices.renovarUsuario(req.body);
+    const resultado = await renovacionServices.renovarUsuario(req.body);
 
     res.status(200).json({
       mensaje: "Usuario renovado exitosamente",
