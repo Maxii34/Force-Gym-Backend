@@ -33,7 +33,6 @@ export const iniciarSesion = async (req, res) => {
       usuario: resultado.usuario,
       token: resultado.token,
     });
-
   } catch (error) {
     console.error(error);
 
@@ -46,26 +45,7 @@ export const iniciarSesion = async (req, res) => {
 export const editarAdministrador = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, apellido, email, password } = req.body;
-
-    // 1. Buscamos al admin por ID primero
-    const admin = await Administrador.findById(id);
-    if (!admin) {
-      return res.status(404).json({ mensaje: "Administrador no encontrado" });
-    }
-
-    // 2. Actualizamos datos básicos si vienen en el body
-    admin.nombre = nombre || admin.nombre;
-    admin.apellido = apellido || admin.apellido;
-    admin.email = email || admin.email;
-
-    // Solo si el usuario envió algo en el campo password, se encripta
-    if (password) {
-      const saltos = await bcrypt.genSalt(10);
-      admin.password = await bcrypt.hash(password, saltos);
-    }
-
-    await admin.save();
+    const adminActualizado = await adminServices.actualizarDatos(id, req.body);
 
     res.status(200).json({
       mensaje: "Administrador actualizado exitosamente",
@@ -119,7 +99,6 @@ export const deleteuserRol = async (req, res) => {
     res.status(500).json({ mensaje: "Error al eliminar el administrador" });
   }
 };
-
 
 export const listarAdmin = async (req, res) => {
   try {

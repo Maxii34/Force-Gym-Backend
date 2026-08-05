@@ -69,7 +69,33 @@ const iniciar = async (dataUser) => {
   };
 };
 
+const actualizarDatos = async (id, dataUser) => {
+  const { id } = id;
+  const { nombre, apellido, email, password } = dataUser;
+  if (!dataUser) {
+    throw new Error("Faltan datos obligatorios ");
+  }
+  //Se busca el id del admin
+  const adminExiste = await adminRepository.buscarPorID(id);
+  if (!adminExiste) {
+    throw new Error("Administrador no encontrado");
+  }
+  //actualiza los datos
+  adminExiste.nombre = nombre || adminExiste.nombre;
+  adminExiste.apellido = apellido || adminExiste.apellido;
+  adminExiste.email = email || adminExiste.email;
+
+  if (password) {
+    const saltos = await bcrypt.genSalt(10);
+    adminExiste.password = await bcrypt.hash(password, saltos);
+  }
+
+  adminExiste.save();
+  return adminExiste;
+};
+
 export default {
   crearUserAdmin,
   iniciar,
+  actualizarDatos,
 };
