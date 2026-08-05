@@ -1,11 +1,9 @@
-import { generarJWT } from "../middlewares/generarJWT.js";
-import Administrador from "../models/administrador.js";
-import bcrypt from "bcrypt";
+import adminServices from "../services/adminServices.js";
 
 // Crear admin por unica vez
 export const crearAdministrador = async (req, res) => {
   try {
-    const nuevoAdministrador = await adminService.crearUserAdmin(req.body);
+    const nuevoAdministrador = await adminServices.crearUserAdmin(req.body);
 
     res.status(201).json({
       mensaje: "Administrador creado exitosamente",
@@ -28,34 +26,20 @@ export const crearAdministrador = async (req, res) => {
 
 export const iniciarSesion = async (req, res) => {
   try {
-    const { nombre, apellido, email, password } = req.body;
-    // Validar datos obligatorios
-    if (!nombre || !apellido || !email || !password) {
-      return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
-    }
+    const resultado = await adminServices.iniciar(req.body);
 
-    const adminExistente = await Administrador.findOne({ email });
-    if (!adminExistente) {
-      return res.status(404).json({ mensaje: "Administrador no encontrado" });
-    }
-
-    const passwordCorrecta = await bcrypt.compare(
-      password,
-      adminExistente.password,
-    );
-    if (!passwordCorrecta) {
-      return res.status(401).json({ mensaje: "Contraseña incorrecta" });
-    }
-
-    const token = generarJWT(adminExistente._id, adminExistente.rol);
     res.status(200).json({
       mensaje: "Inicio de sesión exitoso",
-      usuario: adminExistente,
-      token,
+      usuario: resultado.usuario,
+      token: resultado.token,
     });
+
   } catch (error) {
     console.error(error);
-    res.status(500).json({ mensaje: "Error al iniciar sesión" });
+
+    res.status(400).json({
+      mensaje: error.message,
+    });
   }
 };
 

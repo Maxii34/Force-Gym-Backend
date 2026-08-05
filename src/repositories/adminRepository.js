@@ -1,4 +1,4 @@
-import Administrador from "../models/administrador";
+import Administrador from "../models/administrador.js";
 
 const crearUserAdmin = async (dataUser) => {
   return await Administrador.create(dataUser);
