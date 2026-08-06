@@ -64,8 +64,8 @@ export const editarAdministrador = async (req, res) => {
 
 export const listarAdministradores = async (req, res) => {
   try {
-    const listarAdmin = await Administrador.find().select("-password");
-    res.status(200).json(listarAdmin);
+    const listarAdmin = await adminServices.ListarUsuarios();
+    res.status(200).json({ mensaje: "Usuarios listados", listarAdmin });
   } catch (error) {
     console.error(error);
     res.status(500).json({ mensaje: "Error al listar los administradores" });

@@ -16,9 +16,14 @@ const buscarPorID = async (id) => {
   return await Administrador.findById(id);
 };
 
+const obtenerUsuarios = async () => {
+  return await Administrador.find().select("-password");
+};
+
 export default {
   crearUserAdmin,
   buscarEmail,
   buscarPorRol,
   buscarPorID,
+  obtenerUsuarios,
 };

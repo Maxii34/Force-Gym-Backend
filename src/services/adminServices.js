@@ -94,8 +94,13 @@ const actualizarDatos = async (id, dataUser) => {
   return adminExiste;
 };
 
+const ListarUsuarios = async () => {
+  return await adminRepository.obtenerUsuarios();
+};
+
 export default {
   crearUserAdmin,
   iniciar,
   actualizarDatos,
+  ListarUsuarios,
 };
