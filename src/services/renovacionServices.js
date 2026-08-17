@@ -2,12 +2,13 @@ import usuariosRepository from "../repositories/usuariosRepository.js";
 import renovacionesRepository from "../repositories/renovacionRepository.js";
 import calcularFechaVencimiento from "../utils/calcularFechaVencimiento.js";
 
-
 const renovarUsuario = async (datosRenovacion) => {
   const { dni, pagoMensual, tipoMembresia } = datosRenovacion;
 
   if (!dni || !pagoMensual || !tipoMembresia) {
-    throw new Error("Faltan datos obligatorios (dni, pagoMensual, tipoMembresia)");
+    throw new Error(
+      "Faltan datos obligatorios (dni, pagoMensual, tipoMembresia)",
+    );
   }
 
   const usuario = await usuariosRepository.ingresoUsuarioDNI(dni);
@@ -19,13 +20,15 @@ const renovarUsuario = async (datosRenovacion) => {
   const vencimientoActual = new Date(usuario.fechaVencimiento);
   const fechaBaseCalculo = vencimientoActual < hoy ? hoy : vencimientoActual;
 
-  const nuevaFechaVencimiento = calcularFechaVencimiento(fechaBaseCalculo, tipoMembresia);
-
+  const nuevaFechaVencimiento = calcularFechaVencimiento(
+    fechaBaseCalculo,
+    tipoMembresia,
+  );
   if (!nuevaFechaVencimiento) {
     throw new Error("Tipo de membresía no válido");
   }
 
-  await renovacionesRepository.crearRenovacion({
+  const renovacionCreada = await renovacionesRepository.crearRenovacion({
     dni: usuario.dni,
     pagoMensual,
     tipoMembresia,
@@ -35,15 +38,19 @@ const renovarUsuario = async (datosRenovacion) => {
     fechaVencimiento: nuevaFechaVencimiento,
   });
 
-  const usuarioRenovado = await usuariosRepository.actualizarUsuarioID(usuario._id, {
-    pagoMensual,
-    tipoMembresia,
-    fechaVencimiento: nuevaFechaVencimiento,
-    estado: "activo",
-  });
+  const usuarioRenovado = await usuariosRepository.actualizarUsuarioID(
+    usuario._id,
+    {
+      pagoMensual,
+      tipoMembresia,
+      fechaVencimiento: nuevaFechaVencimiento,
+      estado: "activo",
+    },
+  );
 
   return {
     usuario: usuarioRenovado,
+    renovacion: renovacionCreada,
     vencimiento: nuevaFechaVencimiento,
   };
 };

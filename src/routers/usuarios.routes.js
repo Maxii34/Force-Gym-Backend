@@ -8,10 +8,8 @@ import {
   eliminarUsuario,
   verificarVencimientos,
 } from "../controllers/usuarioDatos.controlers.js";
-import { renovarUsuario } from "../controllers/renovacion.controlers.js";
 import { validarToken } from "../middlewares/validarToken.js";
 import { validarUsuario } from "../middlewares/validacionUsuarios.js";
-import { validarRenovacion } from "../middlewares/validacionRenovacion.js";
 import { permitirRoles } from "../controllers/permisos.js";
 
 const router = Router();
@@ -31,18 +29,6 @@ router.post("/verificar-vencimientos", verificarVencimientos);
 //http://localhost:3000/api/usuarios/ingreso
 //Ruta publica de usuarios
 router.route("/ingreso").post(ingresoUsuarios);
-
-//http://localhost:3000/api/usuarios/renovar/:id
-router
-  .route("/renovar/:id")
-  .post(
-    [
-      validarToken,
-      validarRenovacion,
-      permitirRoles(["admin", "superadmin", "moderador"]),
-    ],
-    renovarUsuario,
-  );
 
 //http://localhost:3000/api/usuarios/:id
 router
