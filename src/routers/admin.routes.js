@@ -8,7 +8,7 @@ import {
   obtenerAdmin,
 } from "../controllers/Admin.controlers.js";
 import { validarToken } from "../middlewares/validarToken.js";
-import { permitirRoles } from "../controllers/permisos.js";
+import { permitirRoles } from "../middlewares/permisos.js";
 
 const router = Router();
 

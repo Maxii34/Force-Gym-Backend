@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { validarToken } from "../middlewares/validarToken";
-import { permitirRoles } from "../controllers/permisos";
-import resultadoValidacion from "../middlewares/resultadoValidacion";
+import { validarToken } from "../middlewares/validarToken.js";
+import { permitirRoles } from "../middlewares/permisos.js";
+import resultadoValidacion from "../middlewares/resultadoValidacion.js";
 import { renovarUsuario } from "../controllers/renovacion.controlers.js";
-import { validarRenovacion } from "../middlewares/validacionRenovacion";
+import { validarRenovacion } from "../middlewares/validacionRenovacion.js";
 
 const router = Router();
 

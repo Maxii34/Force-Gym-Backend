@@ -10,7 +10,7 @@ import {
 } from "../controllers/usuarioDatos.controlers.js";
 import { validarToken } from "../middlewares/validarToken.js";
 import { validarUsuario } from "../middlewares/validacionUsuarios.js";
-import { permitirRoles } from "../controllers/permisos.js";
+import { permitirRoles } from "../middlewares/permisos.js";
 
 const router = Router();
 
