@@ -3,9 +3,17 @@ import ingresosRepository from "../repositories/ingresosRepository.js";
 import calcularFechaVencimiento from "../utils/calcularFechaVencimiento.js";
 
 const crearUsuario = async (datosUser) => {
-  const { dni, nombre, apellido, pagoMensual, tipoMembresia, telefono } = datosUser;
+  const { dni, nombre, apellido, pagoMensual, tipoMembresia, telefono } =
+    datosUser;
 
-  if (!dni || !nombre || !apellido || !pagoMensual || !tipoMembresia || !telefono) {
+  if (
+    !dni ||
+    !nombre ||
+    !apellido ||
+    !pagoMensual ||
+    !tipoMembresia ||
+    !telefono
+  ) {
     throw new Error("Faltan datos obligatorios");
   }
 
@@ -47,32 +55,23 @@ const obtenerUsuarioID = async (id) => {
 };
 
 const actualizarUsuarioID = async (id, datosUser) => {
-  const { nombre, apellido, pagoMensual, tipoMembresia, telefono, dni } =
-    datosUser;
-
-  if (
-    !dni ||
-    !nombre ||
-    !apellido ||
-    !pagoMensual ||
-    !tipoMembresia ||
-    !telefono
-  ) {
+  if (!datosUser || Object.keys(datosUser).length === 0) {
     throw new Error("Faltan datos obligatorios");
   }
 
-  const actualizado = await usuariosRepository.actualizarUsuarioID(id, {
-    nombre,
-    apellido,
-    pagoMensual,
-    tipoMembresia,
-    telefono,
-    dni,
-  });
-
-  if (!actualizado) {
+  const usuarioExiste = await usuariosRepository.obtenerUsuarioId(id);
+  if (!usuarioExiste) {
     throw new Error("Usuario no encontrado");
   }
+
+  const { nombre, apellido, telefono, dni } = datosUser;
+
+  const actualizado = await usuariosRepository.actualizarUsuarioID(id, {
+    nombre: nombre || usuarioExiste.nombre,
+    apellido: apellido || usuarioExiste.apellido,
+    telefono: telefono || usuarioExiste.telefono,
+    dni: dni || usuarioExiste.dni,
+  });
 
   return actualizado;
 };
@@ -144,7 +143,7 @@ const desactivarUsuariosVencidos = async () => {
   const hoy = new Date();
   const resultado = await usuariosRepository.actualizarVencidos(hoy);
   return resultado.modifiedCount;
-}
+};
 
 export default {
   crearUsuario,

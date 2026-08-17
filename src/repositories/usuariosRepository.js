@@ -14,7 +14,7 @@ const obtenerUsuarioId = async (id) => {
 
 const actualizarUsuarioID = async (id, datosUser) => {
   return await UsuarioData.findByIdAndUpdate(id, datosUser, {
-    returnDocument: "after",
+    new: true,
   });
 };
 
