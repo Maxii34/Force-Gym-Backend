@@ -5,34 +5,27 @@ import bcrypt from "bcrypt";
 const crearUserAdmin = async (dataUser) => {
   const { nombre, apellido, email, password, rol } = dataUser;
 
-  // Validar datos obligatorios
   if (!nombre || !apellido || !email || !password || !rol) {
     throw new Error(
       "Faltan datos obligatorios (nombre, apellido, email, password y rol).",
     );
   }
 
-  // Validar email
   const emailExiste = await adminRepository.buscarEmail(email);
-
   if (emailExiste) {
     throw new Error("El email ya está registrado.");
   }
 
-  // Validar roles únicos
   if (rol === "superadmin") {
     const existeElRol = await adminRepository.buscarPorRol(rol);
-
     if (existeElRol) {
       throw new Error(`Ya existe un ${rol} en el sistema.`);
     }
   }
 
-  // Encriptar contraseña
   const saltos = await bcrypt.genSalt(10);
   const passwordEncriptada = await bcrypt.hash(password, saltos);
 
-  // Crear administrador
   const nuevoAdministrador = await adminRepository.crearUserAdmin({
     nombre,
     apellido,
@@ -70,17 +63,16 @@ const iniciar = async (dataUser) => {
 };
 
 const actualizarDatos = async (id, dataUser) => {
-  const { id } = id;
   const { nombre, apellido, email, password } = dataUser;
   if (!dataUser) {
-    throw new Error("Faltan datos obligatorios ");
+    throw new Error("Faltan datos obligatorios");
   }
-  //Se busca el id del admin
+
   const adminExiste = await adminRepository.buscarPorID(id);
   if (!adminExiste) {
     throw new Error("Administrador no encontrado");
   }
-  //actualiza los datos
+
   adminExiste.nombre = nombre || adminExiste.nombre;
   adminExiste.apellido = apellido || adminExiste.apellido;
   adminExiste.email = email || adminExiste.email;
@@ -90,7 +82,7 @@ const actualizarDatos = async (id, dataUser) => {
     adminExiste.password = await bcrypt.hash(password, saltos);
   }
 
-  adminExiste.save();
+  await adminExiste.save(); // ⚠️ le agregué el "await" que faltaba (ver nota abajo)
   return adminExiste;
 };
 
@@ -98,9 +90,35 @@ const ListarUsuarios = async () => {
   return await adminRepository.obtenerUsuarios();
 };
 
+const obtenerUsuarioID = async (id) => {
+  return await adminRepository.buscarPorID(id);
+};
+
+const eliminarUsers = async (id) => {
+  const buscarUser = await adminRepository.buscarPorID(id);
+
+  if (!buscarUser) {
+    throw new Error("Usuario no encontrado");
+  }
+
+  if (buscarUser.rol === "superadmin") {
+    const cantidadSuperAdmin = await adminRepository.contarPorRol("superadmin");
+
+    if (cantidadSuperAdmin <= 1) {
+      throw new Error(
+        "No es posible eliminar el único SuperAdmin del sistema.",
+      );
+    }
+  }
+
+  return await adminRepository.eliminarUser(id); // ✅ ahora sí devuelve el usuario eliminado
+};
+
 export default {
   crearUserAdmin,
   iniciar,
   actualizarDatos,
   ListarUsuarios,
+  eliminarUsers,
+  obtenerUsuarioID,
 };
