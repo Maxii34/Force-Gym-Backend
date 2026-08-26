@@ -1,19 +1,19 @@
-import menbresiaRepository from "../repositories/membreciaRepocitory.js";
+import membresiaRepository from "../repositories/membreciaRepocitory.js";
 
 const crearMembresia = async (membresiaData) => {
   const { nombre, precio, duracion } = membresiaData;
   if (!nombre || !precio || !duracion) {
     throw new Error("Faltan datos obligatorios (nombre, precio, duracion)");
   }
-  return await menbresiaRepository.createMembresia(membresiaData);
+  return await membresiaRepository.createMembresia(membresiaData);
 };
 
 const obtenerMembresias = async () => {
-  return await menbresiaRepository.obtenerMembresias();
+  return await membresiaRepository.obtenerMembresias();
 };
 
 const obtenerMembreciaID = async (id) => {
-  const obtenerID = await menbresiaRepository.obtenerMembresiaPorId(id);
+  const obtenerID = await membresiaRepository.obtenerMembresiaPorId(id);
   if (!obtenerID) {
     throw new Error("Menbrecia no encontrada");
   }
@@ -24,7 +24,7 @@ const actualizarMembresiaID = async (id, membresiaData) => {
   if (!membresiaData || Object.keys(membresiaData).length === 0) {
     throw new Error("Faltan datos obligatorios");
   }
-  const membresiaActualizada = await menbresiaRepository.actualizarMembresia(
+  const membresiaActualizada = await membresiaRepository.actualizarMembresia(
     id,
     membresiaData,
   );
@@ -35,31 +35,27 @@ const actualizarMembresiaID = async (id, membresiaData) => {
 };
 
 const eliminarMembresiaID = async (id) => {
-  const membresiaEliminada = await menbresiaRepository.eliminarMembresia(id);
+  const membresiaEliminada = await membresiaRepository.eliminarMembresia(id);
   if (!membresiaEliminada) {
     throw new Error("Menbrecia no encontrada");
   }
   return membresiaEliminada;
 };
 
-const menbreciaActivas = async () => {
-  return await menbresiaRepository.menbreciaActivas();
-};
-
 const obtenerMembreciasActivas = async () => {
-  return await menbresiaRepository.menbreciaActivas();
+  return await membresiaRepository.obtenerMembresiasActivas();
 };
 
 const contarMembresias = async () => {
-  return await menbresiaRepository.contarMembresias();
+  return await membresiaRepository.contarMembresias();
 }
 
 const contarMembresiasActivas = async () => {
-  return await menbresiaRepository.contarMembresiasActivas();
+  return await membresiaRepository.contarMembresiasActivas();
 }
 
 const contarMembresiasInactivas = async () => {
-  return await menbresiaRepository.contarMembresiasInactivas();
+  return await membresiaRepository.contarMembresiasInactivas();
 }
 
 export default {

@@ -1,8 +1,8 @@
-import menbreciService from "../services/membreciaServices.js";
+import membreciaService from "../services/membreciaServices.js";
 
 export const crearMembresia = async (req, res) => {
   try {
-    const nuevaMembresia = await menbreciService.crearMembresia(req.body);
+    const nuevaMembresia = await membreciaService.crearMembresia(req.body);
     res.status(201).json({
       ok: true,
       mensaje: "Membrecia creada",
@@ -20,7 +20,7 @@ export const crearMembresia = async (req, res) => {
 export const obtenerMembrecia = async (req, res) => {
   try {
     const { id } = req.params;
-    const obtenerMembrecia = await menbreciService.obtenerMembreciaID(id);
+    const obtenerMembrecia = await membreciaService.obtenerMembreciaID(id);
     res.status(200).json({
       ok: true,
       mensaje: "Membrecia obtenida",
@@ -36,7 +36,7 @@ export const obtenerMembrecia = async (req, res) => {
 
 export const obtenerMembrecias = async (req, res) => {
   try {
-    const obtenerMembrecias = await menbreciService.obtenerMembrecias();
+    const obtenerMembrecias = await membreciaService.obtenerMembresias();
     res.status(200).json({
       ok: true,
       mensaje: "Membrecias obtenidas",
@@ -53,7 +53,7 @@ export const obtenerMembrecias = async (req, res) => {
 export const actualizarMembresia = async (req, res) => {
   try {
     const { id } = req.params;
-    const membresiaActualizada = await menbreciService.actualizarMembresiaID(
+    const membresiaActualizada = await membreciaService.actualizarMembresiaID(
       id,
       req.body,
     );
@@ -73,7 +73,7 @@ export const actualizarMembresia = async (req, res) => {
 export const eliminarMembresia = async (req, res) => {
   try {
     const { id } = req.params;
-    const membresiaEliminada = await menbreciService.eliminarMembresiaID(id);
+    const membresiaEliminada = await membreciaService.eliminarMembresiaID(id);
     res.status(200).json({
       ok: true,
       mensaje: "Membrecia eliminada",
@@ -89,7 +89,7 @@ export const eliminarMembresia = async (req, res) => {
 
 export const obtenerMembreciasActivas = async (req, res) => {
   try {
-    const membresiasActivas = await menbreciService.obtenerMembreciasActivas();
+    const membresiasActivas = await membreciaService.obtenerMembreciasActivas();
     res.status(200).json({
       ok: true,
       mensaje: "Membrecias activas obtenidas",
@@ -105,9 +105,9 @@ export const obtenerMembreciasActivas = async (req, res) => {
 
 export const obtenerEstadisticasMembresias = async (req, res) => {
   try {
-    const total = await menbreciService.contarMembresias();
-    const activas = await menbreciService.contarMembresiasActivas();
-    const inactivas = await menbreciService.contarMembresiasInactivas();
+    const total = await membreciaService.contarMembresias();
+    const activas = await membreciaService.contarMembresiasActivas();
+    const inactivas = await membreciaService.contarMembresiasInactivas();
 
     res.status(200).json({
       ok: true,
