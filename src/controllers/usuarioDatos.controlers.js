@@ -1,239 +1,142 @@
-import UsuarioData from "../models/usuarioDatos.js";
-import Ingreso from "../models/ingreso.js";
+import usuariosServices from "../services/usuariosServices.js";
 
-// Ingreso de usuarios
-export const ingresoUsuarios = async (req, res) => {
-  try {
-    const { dni } = req.body;
-
-    if (!dni) {
-      return res.status(400).json({ mensaje: "El DNI es obligatorio" });
-    }
-
-    // 1. Buscar usuario
-    const usuarioExistente = await UsuarioData.findOne({ dni });
-
-    if (!usuarioExistente) {
-      return res
-        .status(404)
-        .json({ mensaje: "El usuario con este DNI no existe" });
-    }
-
-    const fechaActual = new Date();
-    const fechaVencimiento = new Date(usuarioExistente.fechaVencimiento);
-
-    // 2. Validar vencimiento
-    if (fechaActual > fechaVencimiento) {
-      if (usuarioExistente.estado === "activo") {
-        usuarioExistente.estado = "inactivo";
-        await usuarioExistente.save();
-      }
-
-      return res.status(403).json({
-        acceso: false,
-        mensaje:
-          "Membresía expirada. Por favor, renueve su membresía para ingresar.",
-        estado: "inactivo",
-      });
-    }
-
-    // 3. Validar estado
-    if (usuarioExistente.estado !== "activo") {
-      return res.status(403).json({
-        acceso: false,
-        mensaje: "El usuario no está activo",
-      });
-    }
-
-    // 4. Evitar doble ingreso en el mismo día
-    const inicioDelDia = new Date();
-    inicioDelDia.setHours(0, 0, 0, 0);
-
-    const yaIngresoHoy = await Ingreso.findOne({
-      usuarioId: usuarioExistente._id,
-      fechaIngreso: { $gte: inicioDelDia },
-    });
-
-    let ingresoGuardado = null;
-
-    if (!yaIngresoHoy) {
-      ingresoGuardado = await Ingreso.create({
-        usuarioId: usuarioExistente._id,
-        dni: usuarioExistente.dni,
-      });
-    }
-
-    // 5. Respuesta
-    return res.status(200).json({
-      acceso: true,
-      mensaje: yaIngresoHoy
-        ? "Ingreso ya registrado hoy"
-        : "Bienvenido, ingreso registrado",
-      usuario: {
-        nombre: usuarioExistente.nombre,
-        apellido: usuarioExistente.apellido,
-        tipoMembresia: usuarioExistente.tipoMembresia,
-        fechaVencimiento: usuarioExistente.fechaVencimiento,
-      },
-      ingreso: ingresoGuardado || yaIngresoHoy,
-    });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      mensaje: "Error al ingresar el usuario en el servidor",
-      error: error.message,
-    });
-  }
-};
-
-// Crear nuevos usuarios
 export const crearUsuarios = async (req, res) => {
   try {
-    const { dni, nombre, apellido, pagoMensual, tipoMembresia, telefono } =
-      req.body;
-    if (
-      !dni ||
-      !nombre ||
-      !apellido ||
-      !pagoMensual ||
-      !tipoMembresia ||
-      !telefono
-    ) {
-      return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
-    }
-    const usuarioExistente = await UsuarioData.findOne({ dni });
-    if (usuarioExistente) {
-      return res
-        .status(400)
-        .json({ mensaje: "El usuario con este DNI ya existe" });
-    }
-
-    const fechaInicio = new Date();
-    const fechaVencimiento = new Date(fechaInicio);
-
-    // Sumamos meses/años según el plan
-    if (tipoMembresia === "mensual") {
-      fechaVencimiento.setMonth(fechaVencimiento.getMonth() + 1);
-    } else if (tipoMembresia === "trimestral") {
-      fechaVencimiento.setMonth(fechaVencimiento.getMonth() + 3);
-    } else if (tipoMembresia === "semestral") {
-      fechaVencimiento.setMonth(fechaVencimiento.getMonth() + 6);
-    } else if (tipoMembresia === "anual") {
-      fechaVencimiento.setFullYear(fechaVencimiento.getFullYear() + 1);
-    } else {
-      // Por defecto 30 días si hay error
-      fechaVencimiento.setDate(fechaVencimiento.getDate() + 30);
-    }
-
-    const nuevoUsuario = new UsuarioData({
-      dni,
-      nombre,
-      apellido,
-      telefono,
-      pagoMensual,
-      tipoMembresia,
-      fechaInicio,
-      fechaVencimiento,
-      estado: "activo",
+    const usuario = await usuariosServices.crearUsuario(req.body);
+    res.status(201).json({
+      ok: true,
+      mensaje: "Usuario creado exitosamente",
+      usuario,
     });
-    await nuevoUsuario.save();
-
-    res
-      .status(201)
-      .json({ mensaje: "Usuario creado exitosamente", nuevoUsuario });
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ mensaje: "Error al crear el usuario en el servidor" });
+
+    if (
+      error.message === "Faltan datos obligatorios" ||
+      error.message === "El usuario con este DNI ya existe" ||
+      error.message === "Tipo de membresía no válido"
+    ) {
+      return res.status(400).json({ ok: false, mensaje: error.message });
+    }
+
+    res.status(500).json({
+      ok: false,
+      mensaje: "Error al crear el usuario en el servidor",
+    });
   }
 };
 
 export const listarUsuarios = async (req, res) => {
   try {
-    const usuarios = await UsuarioData.find();
-    res.status(200).json({ usuarios });
+    const usuarios = await usuariosServices.obtenerUsuarios();
+    res.status(200).json({
+      ok: true,
+      mensaje: "Usuarios listados",
+      usuarios,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ mensaje: "Error al listar los usuarios" });
+    res.status(500).json({
+      ok: false,
+      mensaje: "Error al listar los usuarios",
+    });
   }
 };
 
 export const obtenerUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-    const octenerUsuario = await UsuarioData.findById(id);
-    if (!octenerUsuario) {
-      return res.status(404).json({ mensaje: "Usuario no encontrado" });
-    }
-
-    res.status(200).json({ mensaje: "Usuario encontrado", octenerUsuario });
+    const usuario = await usuariosServices.obtenerUsuarioID(id);
+    res.status(200).json({
+      ok: true,
+      mensaje: "Usuario encontrado",
+      usuario,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ mensaje: "Error al obtener los datos del usuario" });
+
+    if (error.message === "Usuario no encontrado") {
+      return res.status(404).json({ ok: false, mensaje: error.message });
+    }
+
+    res.status(500).json({
+      ok: false,
+      mensaje: "Error al obtener los datos del usuario",
+    });
   }
 };
 
 export const actualizarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const { nombre, apellido, pagoMensual, tipoMembresia, telefono, dni } =
-      req.body;
-
-    if (
-      !dni ||
-      !nombre ||
-      !apellido ||
-      !pagoMensual ||
-      !tipoMembresia ||
-      !telefono
-    ) {
-      return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
-    }
-
-    const usuarioActualizado = await UsuarioData.findByIdAndUpdate(
-      id,
-      { nombre, apellido, pagoMensual, tipoMembresia, telefono, dni },
-      { new: true, runValidators: true },
-    );
-
-    if (!usuarioActualizado) {
-      return res.status(404).json({ mensaje: "Usuario no encontrado" });
-    }
+    const usuario = await usuariosServices.actualizarUsuarioID(id, req.body);
 
     res.status(200).json({
+      ok: true,
       mensaje: "Usuario actualizado exitosamente",
-      usuarioActualizado,
+      usuario,
     });
   } catch (error) {
     console.error(error);
 
+    if (error.message === "Faltan datos obligatorios") {
+      return res.status(400).json({ ok: false, mensaje: error.message });
+    }
+    if (error.message === "Usuario no encontrado") {
+      return res.status(404).json({ ok: false, mensaje: error.message });
+    }
     if (error.code === 11000) {
       return res.status(400).json({
-        mensaje: "El email o DNI ingresado ya pertenece a otro usuario.",
+        ok: false,
+        mensaje: "El DNI ingresado ya pertenece a otro usuario.",
       });
     }
 
-    // Si no es duplicado, lanzamos el error genérico
-    res
-      .status(500)
-      .json({ mensaje: "Error al actualizar los datos del usuario" });
+    res.status(500).json({
+      ok: false,
+      mensaje: "Error al actualizar los datos del usuario",
+    });
   }
 };
 
 export const eliminarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-    const buscarusuario = await UsuarioData.findByIdAndDelete(id);
-    if (!buscarusuario) {
-      return res.status(404).json({ mensaje: "Usuario no encontrado" });
-    }
-
-    res.status(200).json({ mensaje: "Usuario eliminado exitosamente" });
+    const usuario = await usuariosServices.eliminarUsuarioID(id);
+    res.status(200).json({
+      ok: true,
+      mensaje: "Usuario eliminado exitosamente",
+      usuario,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ mensaje: "Error al eliminar el usuario" });
+
+    if (error.message === "Usuario no encontrado") {
+      return res.status(404).json({ ok: false, mensaje: error.message });
+    }
+
+    res.status(500).json({
+      ok: false,
+      mensaje: "Error al eliminar el usuario",
+    });
+  }
+};
+
+export const verificarVencimientos = async (req, res) => {
+  try {
+    const usuariosDesactivados =
+      await usuariosServices.desactivarUsuariosVencidos();
+
+    res.status(200).json({
+      ok: true,
+      mensaje: "Verificación de vencimientos ejecutada",
+      usuariosDesactivados,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      mensaje: "Error al verificar vencimientos",
+    });
   }
 };

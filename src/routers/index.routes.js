@@ -1,12 +1,20 @@
 import { Router } from "express";
-import usuariosRoutes from "./usuarios.routes.js"
+import usuariosRoutes from "./usuarios.routes.js";
 import adminRoutes from "./admin.routes.js";
 import statsRoutes from "./stats.routes.js";
+import renovarRoutes from "./renovacion.routes.js";
+import menbreciaRoutes from "./membrecia.routes.js";
+import ingresoRoutes from "./ingreso.routes.js";
 
+const router = Router();
 
-const router = Router()
+router.use("/usuarios", usuariosRoutes);
 
-router.use("/usuarios", usuariosRoutes)
+router.use("/ingreso", ingresoRoutes);
+
+router.use("/membrecia", menbreciaRoutes);
+
+router.use("/renovar", renovarRoutes);
 
 router.use("/admin", adminRoutes);
 
