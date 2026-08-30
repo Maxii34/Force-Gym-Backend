@@ -45,10 +45,26 @@ export const registrarIngreso = async (req, res) => {
         mensaje: error.message,
       });
     }
-
     return res.status(500).json({
       ok: false,
       mensaje: "Error al registrar el ingreso",
+    });
+  }
+};
+
+export const obtenerIngresosHoy = async (req, res) => {
+  try {
+    const resultado = await ingresosService.obtenerIngresosHoy();
+    res.status(200).json({
+      ok: true,
+      mensaje: "Ingresos del día obtenidos",
+      data: resultado,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      ok: false,
+      mensaje: "Error al obtener los ingresos del día",
     });
   }
 };

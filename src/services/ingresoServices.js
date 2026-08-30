@@ -1,5 +1,5 @@
 import usuariosRepository from "../repositories/usuariosRepository.js";
-import ingresosRepository from "../repositories/ingresosRepository.js";
+import ingresoRepository from "../repositories/ingresoRepository.js";
 
 const registrarIngreso = async (dni) => {
   if (!dni) {
@@ -31,7 +31,7 @@ const registrarIngreso = async (dni) => {
   const inicioDelDia = new Date();
   inicioDelDia.setHours(0, 0, 0, 0);
 
-  const yaIngresoHoy = await ingresosRepository.buscarIngresoHoy(
+  const yaIngresoHoy = await ingresoRepository.buscarIngresoHoy(
     usuarioExistente._id,
     inicioDelDia,
   );
@@ -39,7 +39,7 @@ const registrarIngreso = async (dni) => {
   let ingresoGuardado = null;
 
   if (!yaIngresoHoy) {
-    ingresoGuardado = await ingresosRepository.crearIngreso(
+    ingresoGuardado = await ingresoRepository.crearIngreso(
       usuarioExistente._id,
       usuarioExistente.dni,
     );
@@ -61,6 +61,25 @@ const registrarIngreso = async (dni) => {
   };
 };
 
+const obtenerIngresosHoy = async () => {
+  const inicioDelDia = new Date();
+  inicioDelDia.setHours(0, 0, 0, 0);
+
+  const finDelDia = new Date();
+  finDelDia.setHours(23, 59, 59, 999);
+
+  const total = await ingresoRepository.contarIngresosHoy(
+    inicioDelDia,
+    finDelDia,
+  );
+
+  return {
+    fecha: inicioDelDia,
+    total,
+  };
+};
+
 export default {
   registrarIngreso,
+  obtenerIngresosHoy,
 };
