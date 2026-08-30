@@ -6,18 +6,25 @@ import {
   actualizarMembresia,
   eliminarMembresia,
   obtenerMembreciasActivas,
-  obtenerEstadisticasMembresias
+  obtenerEstadisticasMembresias,
 } from "../controllers/membrecia.controlers.js";
+import { validarToken } from "../middlewares/validarToken.js";
+import { validarMembresia } from "../middlewares/validacionMembrecia.js";
 
 const router = Router();
 
-router.route("/activas").get(obtenerMembreciasActivas);
-router.route("/estadisticas").get(obtenerEstadisticasMembresias);
-router.route("/").get(obtenerMembrecias).post(crearMembresia);
+router
+  .route("/activas")
+  .get([validarToken, validarMembresia], obtenerMembreciasActivas);
+router.route("/estadisticas").get(validarToken, obtenerEstadisticasMembresias);
+router
+  .route("/")
+  .get(validarToken, obtenerMembrecias)
+  .post([validarToken, validarMembresia], crearMembresia);
 router
   .route("/:id")
-  .get(obtenerMembrecia)
-  .put(actualizarMembresia)
-  .delete(eliminarMembresia);
+  .get(validarToken, obtenerMembrecia)
+  .put([validarToken, validarMembresia], actualizarMembresia)
+  .delete(validarToken, eliminarMembresia);
 
 export default router;
