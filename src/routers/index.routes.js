@@ -4,10 +4,13 @@ import adminRoutes from "./admin.routes.js";
 import statsRoutes from "./stats.routes.js";
 import renovarRoutes from "./renovacion.routes.js";
 import menbreciaRoutes from "./membrecia.routes.js";
+import ingresoRoutes from "./ingreso.routes.js";
 
 const router = Router();
 
 router.use("/usuarios", usuariosRoutes);
+
+router.use("/ingreso", ingresoRoutes);
 
 router.use("/membrecia", menbreciaRoutes);
 

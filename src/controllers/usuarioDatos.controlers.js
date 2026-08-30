@@ -1,46 +1,5 @@
 import usuariosServices from "../services/usuariosServices.js";
 
-export const ingresoUsuarios = async (req, res) => {
-  try {
-    const { dni } = req.body;
-    const resultado = await usuariosServices.ingresoUsuarioDNI(dni);
-
-    return res.status(200).json({
-      ok: true,
-      acceso: true,
-      ...resultado,
-    });
-  } catch (error) {
-    console.error(error);
-
-    if (error.message === "El DNI es obligatorio") {
-      return res.status(400).json({ ok: false, mensaje: error.message });
-    }
-    if (error.message === "El usuario con este DNI no existe") {
-      return res.status(404).json({ ok: false, mensaje: error.message });
-    }
-    if (error.message === "Membresía expirada") {
-      return res.status(403).json({
-        ok: false,
-        acceso: false,
-        mensaje:
-          "Membresía expirada. Por favor, renueve su membresía para ingresar.",
-        estado: "inactivo",
-      });
-    }
-    if (error.message === "El usuario no está activo") {
-      return res
-        .status(403)
-        .json({ ok: false, acceso: false, mensaje: error.message });
-    }
-
-    res.status(500).json({
-      ok: false,
-      mensaje: "Error al ingresar el usuario en el servidor",
-    });
-  }
-};
-
 export const crearUsuarios = async (req, res) => {
   try {
     const usuario = await usuariosServices.crearUsuario(req.body);

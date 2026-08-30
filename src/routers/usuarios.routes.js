@@ -1,6 +1,5 @@
 import { Router } from "express";
 import {
-  ingresoUsuarios,
   crearUsuarios,
   listarUsuarios,
   obtenerUsuario,
@@ -25,10 +24,6 @@ router
 
 //localhost:3000/api/usuarios/verificar-vencimientos
 router.post("/verificar-vencimientos", verificarVencimientos);
-
-//http://localhost:3000/api/usuarios/ingreso
-//Ruta publica de usuarios
-router.route("/ingreso").post(ingresoUsuarios);
 
 //http://localhost:3000/api/usuarios/:id
 router

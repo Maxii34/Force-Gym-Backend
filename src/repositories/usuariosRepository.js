@@ -18,7 +18,7 @@ const actualizarUsuarioID = async (id, datosUser) => {
   });
 };
 
-const ingresoUsuarioDNI = async (dni) => {
+const buscarUsuarioPorDNI = async (dni) => {
   return await UsuarioData.findOne({ dni });
 };
 
@@ -39,7 +39,7 @@ export default {
   obtenerUsuarios,
   obtenerUsuarioId,
   actualizarUsuarioID,
-  ingresoUsuarioDNI,
+  buscarUsuarioPorDNI,
   eliminarUsuarioID,
   actualizarVencidos,
 };
