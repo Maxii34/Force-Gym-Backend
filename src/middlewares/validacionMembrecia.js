@@ -17,5 +17,6 @@ export const validarMembresia = [
   body("duracion")
     .isInt({ gt: 0 })
     .withMessage("La duración debe ser un número positivo"),
-  resultadoValidacion,
+  
+    (req, res, next) => resultadoValidacion(req, res, next),
 ];
