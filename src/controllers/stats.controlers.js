@@ -1,13 +1,15 @@
 import UsuarioData from "../models/usuarioDatos.js";
 import Renovacion from "../models/renovarUsuario.js";
+import Ingreso from "../models/ingreso.js";
 
 export const obtenerDashboardGeneral = async (req, res) => {
   try {
     const hoy = new Date();
     const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    const inicioDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
 
     // Ejecutamos todas las consultas en paralelo para máxima velocidad
-    const [sociosEstado, finanzas, planes] = await Promise.all([
+    const [sociosEstado, finanzas, planes, ingresosHoy, membresiasVencidas, renovacionesHoy] = await Promise.all([
       // 1. Conteo de Activos vs Inactivos
       UsuarioData.aggregate([
         { $group: { _id: "$estado", total: { $sum: 1 } } }
@@ -22,7 +24,16 @@ export const obtenerDashboardGeneral = async (req, res) => {
       // 3. Tipos de planes más vendidos
       UsuarioData.aggregate([
         { $group: { _id: "$tipoMembresia", total: { $sum: 1 } } }
-      ])
+      ]),
+
+      Ingreso.countDocuments({ createdAt: { $gte: inicioDia } }),
+
+      UsuarioData.countDocuments({ fechaVencimiento: { $lt: hoy } }),
+
+      Renovacion.aggregate([
+        { $match: { createdAt: { $gte: inicioDia } } },
+        { $group: { _id: null, total: { $sum: "$pagoMensual" }, cantidad: { $sum: 1 } } },
+      ]),
     ]);
 
     res.status(200).json({
@@ -30,7 +41,10 @@ export const obtenerDashboardGeneral = async (req, res) => {
       data: {
         sociosPorEstado: sociosEstado,
         ingresosMesActual: finanzas[0] || { total: 0, cantidad: 0 },
-        distribucionPlanes: planes
+        distribucionPlanes: planes,
+        ingresosHoy,
+        membresiasVencidas,
+        renovacionesHoy: renovacionesHoy[0] || { total: 0, cantidad: 0 },
       }
     });
   } catch (error) {

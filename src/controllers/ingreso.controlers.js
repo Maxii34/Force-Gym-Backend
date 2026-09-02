@@ -68,3 +68,13 @@ export const obtenerIngresosHoy = async (req, res) => {
     });
   }
 };
+
+export const obtenerDetalleIngresosHoy = async (req, res) => {
+  try {
+    const resultado = await ingresosService.obtenerDetalleIngresosHoy();
+    res.status(200).json({ ok: true, data: resultado });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ ok: false, mensaje: "Error al obtener los accesos del día" });
+  }
+};

@@ -26,6 +26,10 @@ const eliminarUsuarioID = async (id) => {
   return await UsuarioData.findByIdAndDelete(id);
 };
 
+const eliminarUsuarioDNI = async (dni) => {
+  return await UsuarioData.findOneAndDelete({ dni });
+};
+
 
 const actualizarVencidos = async (hoy) => {
   return await UsuarioData.updateMany(
@@ -41,5 +45,6 @@ export default {
   actualizarUsuarioID,
   buscarUsuarioPorDNI,
   eliminarUsuarioID,
+  eliminarUsuarioDNI,
   actualizarVencidos,
 };

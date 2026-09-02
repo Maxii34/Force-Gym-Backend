@@ -15,7 +15,7 @@ const router = Router();
 
 router
   .route("/activas")
-  .get([validarToken, validarMembresia], obtenerMembreciasActivas);
+  .get(obtenerMembreciasActivas);
 router.route("/estadisticas").get(validarToken, obtenerEstadisticasMembresias);
 router
   .route("/")

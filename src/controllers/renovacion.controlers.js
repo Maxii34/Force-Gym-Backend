@@ -29,3 +29,13 @@ export const renovarUsuario = async (req, res) => {
     res.status(500).json({ ok: false, mensaje: "Error al renovar el usuario" });
   }
 };
+
+export const obtenerRenovacionesRecientes = async (req, res) => {
+  try {
+    const renovaciones = await renovacionServices.obtenerRenovacionesRecientes();
+    res.status(200).json({ ok: true, data: renovaciones });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ ok: false, mensaje: "Error al obtener las renovaciones" });
+  }
+};

@@ -11,7 +11,7 @@ const renovarUsuario = async (datosRenovacion) => {
     );
   }
 
-  const usuario = await usuariosRepository.ingresoUsuarioDNI(dni);
+  const usuario = await usuariosRepository.buscarUsuarioPorDNI(dni);
   if (!usuario) {
     throw new Error("Usuario no encontrado con ese DNI");
   }
@@ -55,6 +55,11 @@ const renovarUsuario = async (datosRenovacion) => {
   };
 };
 
+const obtenerRenovacionesRecientes = async () => {
+  return await renovacionesRepository.obtenerRenovacionesRecientes();
+};
+
 export default {
   renovarUsuario,
+  obtenerRenovacionesRecientes,
 };

@@ -64,13 +64,26 @@ const actualizarUsuarioID = async (id, datosUser) => {
     throw new Error("Usuario no encontrado");
   }
 
-  const { nombre, apellido, telefono, dni } = datosUser;
+  const {
+    nombre,
+    apellido,
+    telefono,
+    dni,
+    pagoMensual,
+    tipoMembresia,
+    fechaVencimiento,
+    estado,
+  } = datosUser;
 
   const actualizado = await usuariosRepository.actualizarUsuarioID(id, {
     nombre: nombre || usuarioExiste.nombre,
     apellido: apellido || usuarioExiste.apellido,
     telefono: telefono || usuarioExiste.telefono,
     dni: dni || usuarioExiste.dni,
+    pagoMensual: pagoMensual ?? usuarioExiste.pagoMensual,
+    tipoMembresia: tipoMembresia || usuarioExiste.tipoMembresia,
+    fechaVencimiento: fechaVencimiento || usuarioExiste.fechaVencimiento,
+    estado: estado || usuarioExiste.estado,
   });
 
   return actualizado;
@@ -78,7 +91,9 @@ const actualizarUsuarioID = async (id, datosUser) => {
 
 
 const eliminarUsuarioID = async (id) => {
-  const usuario = await usuariosRepository.eliminarUsuarioID(id);
+  const usuario = /^[0-9]+$/.test(id)
+    ? await usuariosRepository.eliminarUsuarioDNI(id)
+    : await usuariosRepository.eliminarUsuarioID(id);
   if (!usuario) {
     throw new Error("Usuario no encontrado");
   }
