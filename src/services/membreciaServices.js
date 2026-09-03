@@ -5,7 +5,10 @@ const crearMembresia = async (membresiaData) => {
   if (!nombre || !precio || !duracion) {
     throw new Error("Faltan datos obligatorios (nombre, precio, duracion)");
   }
-  return await membresiaRepository.createMembresia(membresiaData);
+  return await membresiaRepository.createMembresia({
+    ...membresiaData,
+    duracionDias: duracion,
+  });
 };
 
 const obtenerMembresias = async () => {

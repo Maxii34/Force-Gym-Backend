@@ -1,17 +1,23 @@
 import usuariosRepository from "../repositories/usuariosRepository.js";
 import renovacionesRepository from "../repositories/renovacionRepository.js";
 import calcularFechaVencimiento from "../utils/calcularFechaVencimiento.js";
+import Membresia from "../models/membrecias.js";
 
 const renovarUsuario = async (datosRenovacion) => {
-  const { dni, pagoMensual, tipoMembresia } = datosRenovacion;
+  const { dni, membresia, pagoMensual, tipoMembresia } = datosRenovacion;
 
-  if (!dni || !pagoMensual || !tipoMembresia) {
+  if (!dni || !membresia || !pagoMensual || !tipoMembresia) {
     throw new Error(
-      "Faltan datos obligatorios (dni, pagoMensual, tipoMembresia)",
+      "Faltan datos obligatorios (dni, membresia, pagoMensual, tipoMembresia)",
     );
   }
 
-  const usuario = await usuariosRepository.ingresoUsuarioDNI(dni);
+  const membresiaSeleccionada = await Membresia.findById(membresia);
+  if (!membresiaSeleccionada || !membresiaSeleccionada.activa) {
+    throw new Error("La membresía no es válida");
+  }
+
+  const usuario = await usuariosRepository.buscarUsuarioPorDNI(dni);
   if (!usuario) {
     throw new Error("Usuario no encontrado con ese DNI");
   }
@@ -41,8 +47,7 @@ const renovarUsuario = async (datosRenovacion) => {
   const usuarioRenovado = await usuariosRepository.actualizarUsuarioID(
     usuario._id,
     {
-      pagoMensual,
-      tipoMembresia,
+      membresia,
       fechaVencimiento: nuevaFechaVencimiento,
       estado: "activo",
     },
@@ -55,6 +60,11 @@ const renovarUsuario = async (datosRenovacion) => {
   };
 };
 
+const obtenerRenovacionesRecientes = async () => {
+  return await renovacionesRepository.obtenerRenovacionesRecientes();
+};
+
 export default {
   renovarUsuario,
+  obtenerRenovacionesRecientes,
 };

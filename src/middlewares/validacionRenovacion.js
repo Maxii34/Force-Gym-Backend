@@ -24,6 +24,11 @@ export const validarRenovacion = [
     .withMessage("El monto del pago es obligatorio")
     .isFloat({ min: 0 })
     .withMessage("El pago debe ser un número positivo"),
+  body("membresia")
+    .notEmpty()
+    .withMessage("La membresía es obligatoria")
+    .isMongoId()
+    .withMessage("La membresía no es válida"),
   body("tipoMembresia")
     .notEmpty()
     .withMessage("El tipo de membresía es obligatorio")

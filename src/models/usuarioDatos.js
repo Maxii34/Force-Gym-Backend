@@ -49,11 +49,6 @@ const usuarioSchema = new Schema(
         message: "El DNI solo debe contener números",
       },
     },
-    pagoMensual: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
     estado: {
       type: String,
       enum: ["activo", "inactivo", "suspendido"],
@@ -67,9 +62,9 @@ const usuarioSchema = new Schema(
       type: Date,
       required: true,
     },
-    tipoMembresia: {
-      type: String,
-      enum: ["mensual", "trimestral", "semestral", "anual"],
+    membresia: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Membresia",
       required: true,
     },
   },

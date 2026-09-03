@@ -1,11 +1,32 @@
 import Membresia from "../models/membrecias.js";
+import UsuarioData from "../models/usuarioDatos.js";
 
 const createMembresia = async (membresiaData) => {
   return await Membresia.create(membresiaData);
 };
 
 const obtenerMembresias = async () => {
-  return await Membresia.find();
+  const usuariosCollection = UsuarioData.collection.name;
+  return await Membresia.aggregate([
+    {
+      $lookup: {
+        from: usuariosCollection,
+        localField: "_id",
+        foreignField: "membresia",
+        as: "socios",
+      },
+    },
+    {
+      $addFields: {
+        totalSocios: { $size: "$socios" },
+      },
+    },
+    {
+      $project: {
+        socios: 0,
+      },
+    },
+  ]);
 };
 
 const obtenerMembresiaPorId = async (id) => {

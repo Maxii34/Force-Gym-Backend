@@ -25,8 +25,19 @@ const contarIngresosHoy = async (inicioDelDia, finDelDia) => {
   });
 };
 
+const obtenerIngresosHoy = async (inicioDelDia, finDelDia, limite = 10) => {
+  return await Ingreso.find({
+    fechaIngreso: { $gte: inicioDelDia, $lt: finDelDia },
+  })
+    .populate("usuarioId", "nombre apellido estado tipoMembresia")
+    .sort({ fechaIngreso: -1 })
+    .limit(limite)
+    .lean();
+};
+
 export default {
   crearIngreso,
   buscarIngresoHoy,
   contarIngresosHoy,
+  obtenerIngresosHoy,
 };

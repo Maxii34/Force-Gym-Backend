@@ -14,7 +14,8 @@ export const crearUsuarios = async (req, res) => {
     if (
       error.message === "Faltan datos obligatorios" ||
       error.message === "El usuario con este DNI ya existe" ||
-      error.message === "Tipo de membresía no válido"
+      error.message === "Tipo de membresía no válido" ||
+      error.message === "La membresía no es válida"
     ) {
       return res.status(400).json({ ok: false, mensaje: error.message });
     }

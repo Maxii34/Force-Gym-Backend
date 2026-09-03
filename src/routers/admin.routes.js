@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   crearAdministrador,
   iniciarSesion,
+  cerrarSesion,
   editarAdministrador,
   deleteuserRol,
   listarAdministradores,
@@ -32,6 +33,9 @@ router.get(
 
 // http://localhost:3000/api/admin/login
 router.post("/login", validarAdminLogin, iniciarSesion);
+
+// http://localhost:3000/api/admin/logout
+router.post("/logout", validarToken, cerrarSesion);
 
 // http://localhost:3000/api/admin/obtener/:id
 router.get(

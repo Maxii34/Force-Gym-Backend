@@ -79,7 +79,17 @@ const obtenerIngresosHoy = async () => {
   };
 };
 
+const obtenerDetalleIngresosHoy = async () => {
+  const inicioDelDia = new Date();
+  inicioDelDia.setHours(0, 0, 0, 0);
+  const finDelDia = new Date();
+  finDelDia.setHours(23, 59, 59, 999);
+
+  return await ingresoRepository.obtenerIngresosHoy(inicioDelDia, finDelDia);
+};
+
 export default {
   registrarIngreso,
   obtenerIngresosHoy,
+  obtenerDetalleIngresosHoy,
 };
