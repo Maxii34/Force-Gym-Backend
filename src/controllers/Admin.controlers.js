@@ -44,6 +44,13 @@ export const iniciarSesion = async (req, res) => {
   }
 };
 
+export const cerrarSesion = (req, res) => {
+  res.status(200).json({
+    ok: true,
+    mensaje: "Sesión cerrada exitosamente",
+  });
+};
+
 export const editarAdministrador = async (req, res) => {
   try {
     const { id } = req.params;
