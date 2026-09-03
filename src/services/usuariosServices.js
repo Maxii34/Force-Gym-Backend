@@ -1,17 +1,15 @@
 import usuariosRepository from "../repositories/usuariosRepository.js";
 import ingresosRepository from "../repositories/ingresosRepository.js";
-import calcularFechaVencimiento from "../utils/calcularFechaVencimiento.js";
+import Membresia from "../models/membrecias.js";
 
 const crearUsuario = async (datosUser) => {
-  const { dni, nombre, apellido, pagoMensual, tipoMembresia, telefono } =
-    datosUser;
+  const { dni, nombre, apellido, membresia, telefono } = datosUser;
 
   if (
     !dni ||
     !nombre ||
     !apellido ||
-    !pagoMensual ||
-    !tipoMembresia ||
+    !membresia ||
     !telefono
   ) {
     throw new Error("Faltan datos obligatorios");
@@ -22,20 +20,23 @@ const crearUsuario = async (datosUser) => {
     throw new Error("El usuario con este DNI ya existe");
   }
 
-  const fechaInicio = new Date();
-  const fechaVencimiento = calcularFechaVencimiento(fechaInicio, tipoMembresia);
-
-  if (!fechaVencimiento) {
-    throw new Error("Tipo de membresía no válido");
+  const membresiaSeleccionada = await Membresia.findById(membresia);
+  if (!membresiaSeleccionada || !membresiaSeleccionada.activa) {
+    throw new Error("La membresía no es válida");
   }
+
+  const fechaInicio = new Date();
+  const fechaVencimiento = new Date(fechaInicio);
+  fechaVencimiento.setDate(
+    fechaVencimiento.getDate() + membresiaSeleccionada.duracionDias,
+  );
 
   return await usuariosRepository.crearUsuario({
     dni,
     nombre,
     apellido,
     telefono,
-    pagoMensual,
-    tipoMembresia,
+    membresia,
     fechaInicio,
     fechaVencimiento,
     estado: "activo",

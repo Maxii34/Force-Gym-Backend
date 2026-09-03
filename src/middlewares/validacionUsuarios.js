@@ -49,19 +49,11 @@ export const validarUsuario = [
         return true;
     }),
 
-  body("pagoMensual")
+  body("membresia")
     .notEmpty()
-    .withMessage("El monto del pago es obligatorio")
-    .isFloat({ min: 0 })
-    .withMessage("El pago debe ser un número positivo"),
-
-  body("tipoMembresia")
-    .notEmpty()
-    .withMessage("El tipo de membresía es obligatorio")
-    .isIn(["mensual", "trimestral", "semestral", "anual"])
-    .withMessage(
-      "El tipo de membresía no es válido (mensual, trimestral, semestral, anual)"
-    ),
+    .withMessage("La membresía es obligatoria")
+    .isMongoId()
+    .withMessage("La membresía no es válida"),
 
 
   body("estado")
